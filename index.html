@@ -1954,16 +1954,7 @@ ${patient.needs_followup}
 }
 async function showCompletedPatients(){
  
-<span
-onclick="restorePatient(${patient.id})"
-style="
-cursor:pointer;
-font-size:24px;
-color:#0d6efd;
-"
-title="Restore">
-<i class="fa-solid fa-rotate-left"></i>
-</span>
+
  
     document.getElementById('completedBtn')
         .classList.add('active');
@@ -1994,15 +1985,31 @@ title="Restore">
         container.innerHTML += `
 <div class="card completed-card">
 
-    <div class="card-top">
-        <div>
-            <i class="fa-solid fa-check"></i>
-            <b> Completed</b>
-            &nbsp;&nbsp;
-            <b>File No:</b> ${patient.file_no}
-        </div>
+<div class="card-top">
+
+    <div>
+        <i class="fa-solid fa-check"></i>
+        <b> Completed</b>
+        &nbsp;&nbsp;
+        <b>File No:</b> ${patient.file_no}
     </div>
 
+    <div style="display:flex;gap:12px;align-items:center;">
+
+        <span
+        onclick="restorePatient(${patient.id})"
+        style="
+        cursor:pointer;
+        font-size:24px;
+        color:#0d6efd;
+        "
+        title="Restore">
+        <i class="fa-solid fa-rotate-left"></i>
+        </span>
+
+    </div>
+
+</div>
     <div class="card-row">
 
         <div>

@@ -827,52 +827,25 @@ Logout
         onchange="importExcel(event)">
 
         </div>
-<div style="
-display:flex;
-gap:15px;
-margin-bottom:20px;
-">
-
-    <div style="
-    background:#0d6efd;
-    color:white;
-    padding:15px;
-    border-radius:12px;
-    min-width:180px;
-    ">
-        Patients:
-        <span id="all-count">0</span>
-    </div>
-
-    <div style="
-    background:#ff8c1a;
-    color:white;
-    padding:15px;
-    border-radius:12px;
-    min-width:180px;
-    ">
-        Follow Up:
-        <span id="followup-count">0</span>
-    </div>
-
-</div>
      <div style="
 display:flex;
 gap:10px;
 margin-bottom:20px;
 ">
 
-    <button
-    class="diagnosis-btn active"
-    onclick="showAllPatients()">
-        All Patients
-    </button>
+<button
+id="allPatientsBtn"
+class="diagnosis-btn active"
+onclick="showAllPatients()">
+    All Patients (0)
+</button>
 
-    <button
-    class="diagnosis-btn special-followup"
-    onclick="showFollowUpPatients()">
-        Follow Up
-    </button>
+<button
+id="followUpBtn"
+class="diagnosis-btn special-followup"
+onclick="showFollowUpPatients()">
+    Follow Up (0)
+</button>
 
 </div>
     <div id="patientsContainer"></div>
@@ -1718,15 +1691,14 @@ async function refreshCounts(){
         .eq('needs_followup', true);
 
     document.getElementById(
-        'all-count'
-    ).textContent =
-        allPatients?.length || 0;
+    'allPatientsBtn'
+).innerHTML =
+    `All Patients (${allPatients?.length || 0})`;
 
-    document.getElementById(
-        'followup-count'
-    ).textContent =
-        followups?.length || 0;
-}
+document.getElementById(
+    'followUpBtn'
+).innerHTML =
+    `Follow Up (${followups?.length || 0})`;}
 async function showFollowUpPatients(){
 
     const { data, error } = await client

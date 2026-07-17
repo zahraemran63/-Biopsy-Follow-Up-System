@@ -1700,6 +1700,11 @@ document.getElementById(
 ).innerHTML =
     `Follow Up (${followups?.length || 0})`;}
 async function showFollowUpPatients(){
+ document.getElementById('followUpBtn')
+    .classList.add('active');
+
+document.getElementById('allPatientsBtn')
+    .classList.remove('active');
 
     const { data, error } = await client
         .from('patients')
@@ -1823,7 +1828,12 @@ ${patient.needs_followup}
 }
     async function showAllPatients(){
      
+document.getElementById('allPatientsBtn')
+    .classList.add('active');
 
+document.getElementById('followUpBtn')
+    .classList.remove('active');
+     
 const { data, error } = await client
     .from('patients')
     .select('*');

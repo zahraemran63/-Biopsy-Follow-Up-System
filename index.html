@@ -1856,17 +1856,23 @@ document.getElementById(
 ).innerHTML =
     `Follow Up (${followups?.length || 0})`;}
 async function showFollowUpPatients(){
- document.getElementById('followUpBtn')
-    .classList.add('active');
 
-document.getElementById('allPatientsBtn')
-    .classList.remove('active');
+    document.getElementById('followUpBtn')
+        .classList.add('active');
+
+    document.getElementById('allPatientsBtn')
+        .classList.remove('active');
+
+    document.getElementById('completedBtn')
+        .classList.remove('active');
 
     const { data, error } = await client
         .from('patients')
         .select('*')
         .eq('needs_followup', true)
-.eq('completed', false);
+        .eq('completed', false);
+
+  
 
     if(error){
         alert(error.message);
@@ -2097,18 +2103,22 @@ async function showCompletedPatients(){
     });
 }
     async function showAllPatients(){
-     
-document.getElementById('allPatientsBtn')
-    .classList.add('active');
 
-document.getElementById('followUpBtn')
-    .classList.remove('active');
-     
-const { data, error } = await client
-    .from('patients')
-    .select('*')
-.eq('completed', false);
+    document.getElementById('allPatientsBtn')
+        .classList.add('active');
 
+    document.getElementById('followUpBtn')
+        .classList.remove('active');
+
+    document.getElementById('completedBtn')
+        .classList.remove('active');
+
+    const { data, error } = await client
+        .from('patients')
+        .select('*')
+        .eq('completed', false);
+
+ 
 console.log(data);
      
     if(error){

@@ -1,1 +1,2657 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+ 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+ <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+
+    
+
+       
+    <script>
+      document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+
+        document.body.style.display = 'none';
+
+        setTimeout(() => {
+            document.body.style.display = '';
+        }, 50);
+
+    }
+);
+
+
+
+function login(){
+    const password =
+        document
+        .getElementById('loginPassword')
+        .value
+        .trim();
+
+    const welcome =
+        document.getElementById(
+            'welcomeUser'
+        );
+
+    if(password === '3136'){
+
+        sessionStorage.setItem(
+            'loggedIn',
+            'zahy'
+        );
+
+        welcome.innerHTML = `
+<div class="user-badge">Z</div>
+<div>
+    <div style="font-size:13px;color:#6b7280;">
+        Logged In
+    </div>
+    <div style="font-size:16px;font-weight:700;">
+        Zahy
+    </div>
+</div>
+`;
+        document.getElementById(
+            'loginOverlay'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'logoutBtn'
+        ).style.display = 'block';
+
+        return;
+    }
+
+    if(password === '000'){
+
+        sessionStorage.setItem(
+            'loggedIn',
+            'admin'
+        );
+
+welcome.innerHTML = `
+<div class="user-badge">A</div>
+<div>
+    <div style="font-size:13px;color:#6b7280;">
+        Logged In
+    </div>
+    <div style="font-size:16px;font-weight:700;">
+        Admin
+    </div>
+</div>
+`;
+
+        document.getElementById(
+            'loginOverlay'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'logoutBtn'
+        ).style.display = 'block';
+
+        return;
+    }
+
+    document.getElementById(
+        'loginError'
+    ).innerHTML =
+        '❌ Incorrect Password';
+}
+
+
+document.addEventListener(
+    'keydown',
+    e => {
+
+        if(e.key === 'Enter'){
+            login();
+        }
+
+    }
+);
+
+window.onload = () => {
+
+    const user =
+        sessionStorage.getItem(
+            'loggedIn'
+        );
+
+    if(user === 'zahy'){
+
+    document.getElementById(
+        'loginOverlay'
+    ).style.display = 'none';
+
+    document.getElementById(
+        'welcomeUser'
+    ).innerHTML = `
+    <div class="user-badge">Z</div>
+    <div>
+        <div style="font-size:13px;color:#6b7280;">
+            Logged In
+        </div>
+        <div style="font-size:16px;font-weight:700;">
+            Zahy
+        </div>
+    </div>
+    `;
+
+    document.getElementById(
+        'logoutBtn'
+    ).style.display = 'block';
+}
+
+    if(user === 'admin'){
+
+    document.getElementById(
+        'loginOverlay'
+    ).style.display = 'none';
+
+    document.getElementById(
+        'welcomeUser'
+    ).innerHTML = `
+    <div class="user-badge">A</div>
+    <div>
+        <div style="font-size:13px;color:#6b7280;">
+            Logged In
+        </div>
+        <div style="font-size:16px;font-weight:700;">
+            Admin
+        </div>
+    </div>
+    `;
+
+    document.getElementById(
+        'logoutBtn'
+    ).style.display = 'block';
+}
+
+
+
+};
+
+        
+console.log('ExcelJS =', typeof ExcelJS);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<style>
+ .card:not(.followup-card){
+    background:#f8fbff;
+}
+ .card:not(.followup-card) .card-top{
+    background:linear-gradient(
+        180deg,
+        #f3f8ff,
+        #edf5ff
+    );
+
+    margin:-16px -20px 15px -14px;
+
+    padding:16px 20px 12px 20px;
+
+    border-bottom:2px solid #c7daff;
+
+    border-radius:20px 20px 0 0;
+}
+ .card-item{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.card-label{
+    font-weight:700;
+    font-size:16px;
+}
+
+.card-value{
+    padding-left:12px;
+    border-left:3px solid #d1d5db;
+    word-break:break-word;
+    overflow-wrap:anywhere;
+    line-height:1.5;
+}
+ .followup-badge{
+    display:inline-block;
+    margin-left:10px;
+    padding:4px 10px;
+    border-radius:999px;
+
+    background:#ff8c1a;
+    color:white;
+
+    font-size:12px;
+    font-weight:700;
+}
+.card.followup-card{
+
+    background:
+    linear-gradient(
+        135deg,
+        #fffaf3,
+        #fff4e5
+    );
+
+    box-shadow:
+        0 10px 25px rgba(255,140,26,.15);
+}
+
+
+.card-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:30px;
+}
+
+ 
+.card-row > div{
+    position:relative;
+    min-width:0;
+    overflow-wrap:anywhere;
+}
+.info-separator{
+    border:none;
+    border-top:1px solid #e5e7eb;
+    margin:15px 0;
+}
+/* الفاصل العمودي */
+.card-row > div:not(:last-child)::after{
+    content:'';
+    position:absolute;
+
+    top:-16px;
+    bottom:-16px;
+
+    right:-15px;
+
+    width:1px;
+
+    background:#d1d5db;
+}
+
+ 
+.card hr{
+    border:none;
+    border-top:1px solid #e5e7eb;
+    margin:15px 0;
+}
+.followup-card .card-top{
+    background:linear-gradient(
+        180deg,
+        #fff0dc,
+        #ffead1
+    );
+
+    margin:-16px -20px 15px -14px;
+
+    padding:16px 20px 12px 20px;
+
+    border-bottom:2px solid #d8bb8f;
+}
+
+.card-top{
+ border-radius:20px 20px 0 0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:15px;
+    padding-bottom:12px;
+
+    border-bottom:1px solid #cfc5b6;
+}
+    
+.card.followup-card::before{
+
+    background:
+    linear-gradient(
+        180deg,
+        #ff8c1a,
+        #ffc107
+    );
+}
+    
+.followup-icon{
+    cursor:pointer;
+    color:#c7c7c7;
+    transition:.2s;
+}
+
+.followup-icon.active{
+    color:#ff8c1a;
+    text-shadow:0 0 8px rgba(255,140,26,.35);
+}
+
+.followup-icon:hover{
+    transform:scale(1.15);
+}
+    
+.diagnosis-btn.active{
+    background:#198754 !important;
+    color:white !important;
+    transform:translateY(-2px);
+    border:2px solid #146c43;
+    box-shadow:0 4px 12px rgba(25,135,84,.35);
+}
+#diagnosesContainer{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:20px;
+}
+
+.diagnosis-btn{
+    background:#0d6efd;
+    color:white;
+    padding:12px 20px;
+    border-radius:10px;
+    border:none;
+    font-size:16px;
+}
+
+.diagnosis-btn:hover{
+    background:#0b5ed7;
+}
+    .special-followup{
+    background:#ff8c1a !important;
+    color:white !important;
+}
+
+.special-followup:hover{
+    background:#e67e00 !important;
+}
+
+.special-explain{
+    background:#fbbc04 !important;
+    color:black !important;
+}
+
+.special-explain:hover{
+    background:#e0a800 !important;
+}
+    
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+    padding:20px;
+    padding-top:90px;
+}
+    .modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+}
+
+.modal-content{
+    width:550px;
+    background:white;
+    margin:15px auto;
+    padding:15px;
+    border-radius:12px;
+}
+
+.modal-content input{
+    width:100%;
+    padding:12px;
+    box-sizing:border-box;
+}
+.modal-content select{
+    width:100%;
+    padding:12px;
+    box-sizing:border-box;
+}
+.modal-actions{
+    margin-top:15px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+}
+h1{
+    color:#0d6efd;
+}
+
+.row{
+    display:flex;
+    gap:12px;
+    margin-bottom:25px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+input{
+    flex:1;
+    padding:12px;
+    font-size:16px;
+}
+
+button{
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+    button:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+
+.add{
+    background:#198754;
+    color:white;
+}
+
+.delete{
+    background:#dc3545;
+    color:white;
+}
+
+.card{
+    
+    display:block;
+    width:100%;
+    box-sizing:border-box;
+
+    position:relative;
+
+    background:white;
+
+    padding:16px 20px 16px 24px;
+
+    margin-top:12px;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    border:none;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+    transition:.25s;
+}
+.card:hover{
+    transform:translateY(-3px);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.12);
+}
+    .card::before{
+
+    content:'';
+
+    position:absolute;
+
+    top:0;
+    left:0;
+
+    width:10px;
+    height:100%;
+
+    background:
+    linear-gradient(
+        180deg,
+        #2563eb,
+        #06b6d4
+    );
+}
+    .card::after{
+
+    content:'✚';
+
+    position:absolute;
+
+    right:15px;
+    bottom:10px;
+
+    font-size:90px;
+
+    font-weight:bold;
+
+    color:rgba(220,53,69,.08);
+
+    pointer-events:none;
+}
+
+   
+    .card.followup-card::after{
+
+    color:rgba(255,140,26,.08);
+}
+.diagnosis-badge{
+    display:inline-block;
+    margin-left:8px;
+    padding:5px 12px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#0d6efd,#198754);
+    color:white;
+    font-size:13px;
+    font-weight:700;
+}
+
+
+#loginOverlay{
+    position:fixed;
+    inset:0;
+    background:linear-gradient(135deg,#0d6efd,#198754);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:99999;
+}
+
+.login-box{
+    width:400px;
+    background:white;
+    padding:40px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+}
+
+.login-logo{
+    font-size:70px;
+    margin-bottom:10px;
+}
+
+.login-box input{
+    width:100%;
+    padding:14px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    box-sizing:border-box;
+}
+
+.login-box button{
+    width:100%;
+    margin-top:15px;
+    background:#0d6efd;
+    color:white;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+}
+
+#loginError{
+    color:red;
+    margin-top:10px;
+}
+
+#welcomeUser{
+     position:absolute;
+    top:15px;
+    left:15px;
+    z-index:99999;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    background:rgba(255,255,255,.95);
+    backdrop-filter:blur(12px);
+
+    padding:12px 18px;
+
+    border-radius:18px;
+
+    border:1px solid rgba(255,255,255,.5);
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.12);
+
+    color:#111827;
+
+    font-size:15px;
+    font-weight:600;
+
+    transition:.25s;
+}
+
+#welcomeUser:hover{
+    transform:translateY(-2px);
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.18);
+}
+
+.user-badge{
+    width:42px;
+    height:42px;
+
+    border-radius:50%;
+
+    background:linear-gradient(
+        135deg,
+        #0d6efd,
+        #198754
+    );
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:white;
+    font-weight:bold;
+    font-size:16px;
+}
+
+#logoutBtn{
+    position:absolute;
+    top:15px;
+    right:15px;
+
+    z-index:99999;
+
+    background:#dc3545;
+    color:white;
+
+    padding:12px 20px;
+
+    border:none;
+    border-radius:14px;
+
+    font-weight:600;
+
+    box-shadow:
+        0 8px 20px rgba(220,53,69,.25);
+
+    transition:.25s;
+}
+
+#logoutBtn:hover{
+    transform:translateY(-2px);
+    background:#bb2d3b;
+}
+
+</style>
+</head>
+
+    <body>
+
+        <div id="loginOverlay">
+    <div class="login-box">
+
+        <div class="login-logo">🩺</div>
+
+        <h2>Patient Records System</h2>
+
+        <p>Please enter password</p>
+
+        <input
+            type="password"
+            id="loginPassword"
+            placeholder="Password"
+        >
+
+        <button onclick="login()">
+            Login
+        </button>
+
+        <div id="loginError"></div>
+
+    </div>
+</div>
+
+<div id="welcomeUser"></div>
+        <button
+id="logoutBtn"
+onclick="logout()"
+style="
+top:15px;
+right:15px;
+display:none;
+background:#dc3545;
+color:white;
+z-index:1000;
+">
+Logout
+</button>
+
+    <div style="text-align:center;margin-bottom:25px;">
+
+    <div style="font-size:70px;">
+        🩺 ❤️
+    </div>
+
+    <h1 style="
+        color:#0d6efd;
+        font-size:48px;
+        margin-top:10px;
+    ">
+        Patient Records System
+    </h1>
+
+</div>
+
+
+<div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:20px;
+    flex-wrap:nowrap;
+">
+
+    <!-- Search -->
+    <div style="
+        position:relative;
+        width:650px;
+        flex-shrink:0;
+    ">
+        <input
+            id="searchInput"
+            type="text"
+            placeholder="Search File No, Name or Date"
+            onkeyup="searchPatients()"
+            style="
+                width:100%;
+                padding:12px 50px 12px 12px;
+                font-size:18px;
+                border:1px solid #ccc;
+                border-radius:8px;
+                box-sizing:border-box;
+            "
+        >
+
+        <input
+            id="hiddenDate"
+            type="date"
+            onchange="setDateSearch(this.value)"
+            style="
+                position:absolute;
+                top:0;
+                right:0;
+                width:40px;
+                height:100%;
+                opacity:0;
+                cursor:pointer;
+            "
+        >
+
+        <span style="
+            position:absolute;
+            right:12px;
+            top:50%;
+            transform:translateY(-50%);
+            font-size:22px;
+            pointer-events:none;
+        ">
+        📅
+        </span>
+    </div>
+
+    <!-- Buttons -->
+    <div style="
+        display:flex;
+        gap:12px;
+        align-items:center;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+    ">
+
+        <button class="add" onclick="openPatientModal()">
+            + Add Patient
+        </button>
+
+        <button class="add" onclick="openDiagnosisModal()">
+            + Add Diagnosis
+        </button>
+
+        <button class="delete" onclick="openDeleteDiagnosisModal()">
+            - Delete Diagnosis
+        </button>
+
+        <button
+            id="importBtn"
+            class="add"
+            onclick="document.getElementById('excelFile').click()">
+            📊 Import Excel
+        </button>
+
+        <button
+            id="exportBtn"
+            style="background:#198754;color:white;"
+            onclick="exportExcel()">
+            📊 Export Excel
+        </button>
+
+    </div>
+
+    <input
+        type="file"
+        id="excelFile"
+        accept=".xlsx,.xls"
+        style="display:none"
+        onchange="importExcel(event)">
+</div>
+
+<div id="deleteDiagnosisModal" class="modal">
+
+    <div class="modal-content">
+
+        <h2>Delete Diagnosis</h2>
+
+        <select
+        id="deleteDiagnosisSelect"
+        style="width:100%;padding:12px;">
+
+        </select>
+
+        <div class="modal-actions">
+
+            <button
+            class="delete"
+            onclick="confirmDeleteDiagnosis()">
+            OK
+            </button>
+
+            <button
+            class="add"
+            onclick="closeDeleteDiagnosisModal()">
+            Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="diagnosesContainer"></div>
+    <div id="patientsContainer"></div>
+    <div id="patientModal" class="modal">
+
+    <div class="modal-content" style="width:550px;">
+
+        <h2>File Entry</h2>
+
+<label>File No:</label>
+<input id="fileNo">
+
+<br><br>
+
+<label>Name:</label>
+<input id="patientName">
+
+<br><br>
+
+<label>Mobile:</label>
+<input id="phone">
+
+<br><br>
+
+<label>Diagnosis:</label>
+<select
+id="patientDiagnosis"
+style="width:100%;padding:12px;">
+</select>
+
+<br><br>
+
+<label>Remarks:</label>
+<textarea
+id="remarks"
+style="width:100%;height:70px;"></textarea>
+
+<br><br>
+
+<label>Last Update:</label>
+<input
+id="lastUpdate"
+type="date">
+        
+        <div class="modal-actions">
+
+            <button
+            class="add"
+            onclick="savePatient()">
+            OK
+            </button>
+
+            <button
+            class="delete"
+            onclick="closePatientModal()">
+            Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+    <div id="diagnosisModal" class="modal">
+
+    <div class="modal-content">
+
+        <h2>Add New Diagnosis</h2>
+
+        <input
+        id="diagnosisName"
+        placeholder="Diagnosis Name"
+        >
+
+        <div class="modal-actions">
+
+            <button
+            class="add"
+            onclick="addDiagnosis()">
+            Save
+            </button>
+
+            <button
+            class="delete"
+            onclick="closeDiagnosisModal()">
+            Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+ function sendWhatsApp(patient){
+
+    const phone = '966546850222';
+
+    const message = `
+🩺 Patient Information
+
+📁 File No: ${patient.file_no || '-'}
+👤 Name: ${patient.name || '-'}
+📞 Mobile: ${patient.phone || '-'}
+🩺 Diagnosis: ${patient.diagnosis || '-'}
+📝 Remarks: ${patient.remarks || '-'}
+📅 Last Update: ${patient.last_update || '-'}
+`;
+
+    const url =
+        `https://wa.me/${phone}?text=` +
+        encodeURIComponent(message);
+
+    window.open(url, '_blank');
+}
+    function logout(){
+
+    sessionStorage.clear();
+
+    location.reload();
+}
+function searchPatients(){
+
+    const keyword =
+        document
+            .getElementById('searchInput')
+            .value
+            .trim()
+            .toLowerCase();
+
+    const cards =
+        document.querySelectorAll('.card');
+
+    cards.forEach(card => {
+
+        const text =
+            card.innerText.toLowerCase();
+
+        const date =
+            (card.dataset.date || '')
+            .toLowerCase();
+
+        card.style.display =
+            text.includes(keyword) ||
+            date.includes(keyword)
+            ? ''
+            : 'none';
+
+    });
+
+}
+
+const client = window.supabase.createClient(
+'https://pzkzphjonazlrvgnwcbh.supabase.co',
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6a3pwaGpvbmF6bHJ2Z253Y2JoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyOTY0NTUsImV4cCI6MjA5OTg3MjQ1NX0.NY0rkhl4YW24ADAUG7n5R60xpshGuuj5eSBA2gHdPbY'
+);
+console.log(client);
+    console.log(typeof XLSX);
+    function setActiveDiagnosis(button){
+
+    document
+        .querySelectorAll('.diagnosis-btn')
+        .forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+    button.classList.add('active');
+}
+ 
+ function setDateSearch(date){
+
+    const parts = date.split('-');
+
+    const formatted =
+        `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+    document.getElementById(
+        'searchInput'
+    ).value = formatted;
+
+    searchPatients();
+}
+    async function toggleFollowUp(id, currentDiagnosis, needsFollowup){
+
+    if(!needsFollowup){
+
+        const { error } = await client
+            .from('patients')
+            .update({
+                needs_followup: true,
+                original_diagnosis: currentDiagnosis
+            })
+            .eq('id', id);
+
+        if(error){
+            alert(error.message);
+            return;
+        }
+
+    } else {
+
+        const { error } = await client
+            .from('patients')
+.update({
+    needs_followup: false,
+    original_diagnosis: null
+})
+            .eq('id', id);
+
+        if(error){
+            alert(error.message);
+            return;
+        }
+
+    }
+
+   
+await showAllPatients();
+await refreshCounts();
+     
+}
+    
+
+async function exportExcel() {
+
+    const btn =
+        document.getElementById('exportBtn');
+
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Exporting...';
+
+    try {
+
+        const workbook =
+            new ExcelJS.Workbook();
+
+        workbook.creator =
+            'Biopsy Follow Up System';
+
+        workbook.created =
+            new Date();
+
+        const summarySheet =
+            workbook.addWorksheet(
+                'Summary'
+            );
+
+        summarySheet.columns = [
+            {
+                header: 'Diagnosis',
+                key: 'diagnosis',
+                width: 40
+            },
+            {
+                header: 'Patients',
+                key: 'count',
+                width: 20
+            }
+        ];
+
+        summarySheet.getRow(1).eachCell(cell => {
+
+            cell.font = {
+                bold: true,
+                color: {
+                    argb: 'FFFFFFFF'
+                }
+            };
+
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: {
+                    argb: '1F4E78'
+                }
+            };
+
+            cell.border = {
+                top: { style:'thin' },
+                left:{ style:'thin' },
+                bottom:{ style:'thin' },
+                right:{ style:'thin' }
+            };
+
+        });
+
+        const { data: diagnoses } =
+            await client
+                .from('diagnoses')
+                .select('*')
+                .order('name');
+
+        for (const diag of diagnoses) {
+
+if(
+    diag.name === 'Explain' ||
+    diag.name === '🔔 Follow Up'
+){
+    continue;
+}
+
+
+
+            const {
+                data: patients
+            } = await client
+                .from('patients')
+                .select('*')
+                .eq(
+                    'diagnosis',
+                    diag.name
+                )
+                .order('file_no');
+
+            summarySheet.addRow({
+                diagnosis: diag.name,
+                count: patients.length
+            });
+
+            const sheet =
+                workbook.addWorksheet(
+                    diag.name.substring(0,31)
+                );
+
+            sheet.mergeCells('A1:E1');
+
+            sheet.getCell('A1').value =
+                'BIOPSY FOLLOW UP SYSTEM';
+
+            sheet.getCell('A1').font = {
+                size:18,
+                bold:true,
+                color:{
+                    argb:'FFFFFFFF'
+                }
+            };
+
+            sheet.getCell('A1').alignment = {
+                horizontal:'center'
+            };
+
+            sheet.getCell('A1').fill = {
+                type:'pattern',
+                pattern:'solid',
+                fgColor:{
+                    argb:'1F4E78'
+                }
+            };
+
+            sheet.mergeCells('A2:E2');
+
+            sheet.getCell('A2').value =
+                `Diagnosis: ${diag.name}`;
+
+            sheet.mergeCells('A3:E3');
+
+            sheet.getCell('A3').value =
+                `Total Patients: ${patients.length}`;
+
+            sheet.mergeCells('A4:E4');
+
+            sheet.getCell('A4').value =
+                `Export Date: ${new Date().toLocaleDateString()}`;
+
+            sheet.columns = [
+{
+header:'S.No',
+key:'no',
+width:10
+},
+{
+header:'MRN',
+key:'mrn',
+width:20
+},
+{
+header:'Name',
+key:'name',
+width:35
+},
+{
+header:'Mobile',
+key:'phone',
+width:25
+},
+{
+header:'Remark',
+key:'remark',
+width:50
+},
+{
+header:'Last Update',
+key:'update',
+width:20
+}
+];
+
+            const headerRow =
+                sheet.getRow(6);
+
+            headerRow.values = [
+'S.No',
+'MRN',
+'Name',
+'Mobile',
+'Remark',
+'Last Update'
+];
+
+            headerRow.eachCell(cell => {
+
+                cell.font = {
+                    bold:true,
+                    color:{
+                        argb:'FFFFFFFF'
+                    }
+                };
+
+                cell.fill = {
+                    type:'pattern',
+                    pattern:'solid',
+                    fgColor:{
+                        argb:'4472C4'
+                    }
+                };
+
+                cell.alignment = {
+                    horizontal:'center'
+                };
+
+                cell.border = {
+                    top:{style:'thin'},
+                    left:{style:'thin'},
+                    bottom:{style:'thin'},
+                    right:{style:'thin'}
+                };
+
+            });
+
+            patients.forEach(
+                (patient,index) => {
+
+                const row =
+sheet.addRow({
+
+    no:index+1,
+
+    mrn:
+        patient.file_no || '',
+
+    name:
+        patient.name || '',
+
+    phone:
+        patient.phone || '',
+
+    remark:
+        patient.remarks || '',
+
+    update:
+        patient.last_update || ''
+
+});
+
+                row.eachCell(cell => {
+
+                    cell.border = {
+                        top:{style:'thin'},
+                        left:{style:'thin'},
+                        bottom:{style:'thin'},
+                        right:{style:'thin'}
+                    };
+
+                });
+
+                if(index % 2 === 0){
+
+                    row.eachCell(cell => {
+
+                        cell.fill = {
+                            type:'pattern',
+                            pattern:'solid',
+                            fgColor:{
+                                argb:'F3F6FA'
+                            }
+                        };
+
+                    });
+                }
+
+            });
+
+            sheet.views = [
+                {
+                    state:'frozen',
+                    ySplit:6
+                }
+            ];
+
+            sheet.autoFilter = {
+from:'A6',
+to:'F6'
+};
+        }
+summarySheet.addRow([]);
+
+const totalRow1 = summarySheet.addRow({
+    diagnosis: 'Total Diagnoses',
+    count: diagnoses.filter(
+        d =>
+        d.name !== 'Explain' &&
+        d.name !== '🔔 Follow Up'
+    ).length
+});
+
+const { count: totalPatientsCount } =
+    await client
+        .from('patients')
+        .select('id', {
+            count: 'exact',
+            head: true
+        })
+        .not('diagnosis', 'ilike', 'explain');
+
+const totalRow2 = summarySheet.addRow({
+    diagnosis: 'Total Patients',
+    count: totalPatientsCount || 0
+});
+
+[totalRow1, totalRow2].forEach(row => {
+
+    row.eachCell(cell => {
+
+        cell.font = {
+            bold: true,
+            color: {
+                argb: 'FFFFFFFF'
+            }
+        };
+
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: {
+                argb: '1F4E78'
+            }
+        };
+
+        cell.border = {
+            top: { style:'thin' },
+            left:{ style:'thin' },
+            bottom:{ style:'thin' },
+            right:{ style:'thin' }
+        };
+
+    });
+
+});
+        const buffer =
+            await workbook.xlsx.writeBuffer();
+
+        const blob =
+            new Blob(
+                [buffer],
+                {
+                    type:
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                }
+            );
+
+        const link =
+            document.createElement('a');
+
+        const today =
+            new Date()
+            .toISOString()
+            .split('T')[0];
+
+        link.href =
+            URL.createObjectURL(blob);
+
+        link.download =
+            `Biopsy_Follow_Up_${today}.xlsx`;
+
+        link.click();
+
+    }
+    catch(error){
+
+        alert(error.message);
+
+    }
+    finally{
+
+        btn.disabled = false;
+
+        btn.innerHTML =
+            '📊 Export Excel';
+    }
+}
+    async function importExcel(event){
+        if(typeof XLSX === 'undefined'){
+    alert('XLSX Library Not Loaded');
+    return;
+}
+
+    const btn =
+        document.getElementById('importBtn');
+
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Importing...';
+
+    try {
+
+        const file = event.target.files[0];
+
+        if(!file){
+            return;
+        }
+
+        const data =
+            await file.arrayBuffer();
+
+        const workbook =
+            XLSX.read(data);
+
+        for(const sheetName of workbook.SheetNames){
+
+            const diagnosisName =
+                sheetName.trim();
+
+            const {
+                data: existingDiagnosis
+            } = await client
+                .from('diagnoses')
+                .select('id')
+                .ilike('name', diagnosisName);
+
+            if(
+                !existingDiagnosis ||
+                existingDiagnosis.length === 0
+            ){
+
+                await client
+                    .from('diagnoses')
+                    .insert({
+                        name: diagnosisName
+                    });
+            }
+
+            const sheet =
+                workbook.Sheets[sheetName];
+
+            const rows =
+                XLSX.utils.sheet_to_json(
+                    sheet,
+                    { header:1 }
+                );
+
+            for(let i = 1; i < rows.length; i++){
+
+                const row = rows[i];
+
+                if(!row){
+                    continue;
+                }
+
+                const fileNo =
+                    row[1] || '';
+
+                const name =
+                    row[2] || '';
+
+                const phone =
+row[3] || '';
+
+const remarks =
+row[4] || '';
+
+const lastUpdate =
+row[5] || null;
+
+                if(
+                    !fileNo &&
+                    !name &&
+                    !remarks &&
+                    !lastUpdate
+                ){
+                    continue;
+                }
+
+                await client
+                    .from('patients')
+.insert({
+file_no:String(fileNo),
+name:String(name),
+phone:String(phone),
+diagnosis:diagnosisName,
+remarks:String(remarks),
+last_update:lastUpdate || null
+
+                    });
+
+            }
+        }
+
+        await loadDiagnoses();
+
+        await showAllPatients();
+
+        alert(
+            'Import completed successfully'
+        );
+
+    }
+    catch(error){
+
+        alert(error.message);
+
+    }
+    finally {
+
+        btn.disabled = false;
+        btn.innerHTML = 'Import Excel';
+
+        document.getElementById(
+            'excelFile'
+        ).value = '';
+
+    }
+}
+    async function savePatient(){
+
+    const fileNo =
+        document.getElementById('fileNo').value.trim();
+
+const name =
+document.getElementById('patientName').value.trim();
+
+const phone =
+document.getElementById('phone').value.trim();
+
+const diagnosis =
+document.getElementById('patientDiagnosis').value;
+
+    const remarks =
+        document.getElementById('remarks').value;
+
+    const lastUpdate =
+        document.getElementById('lastUpdate').value;
+
+    if(!fileNo || !name){
+
+        alert('Please fill required fields');
+
+        return;
+    }
+
+    const { data: existing } = await client
+        .from('patients')
+        .select('id')
+        .eq('file_no', fileNo)
+        .eq('diagnosis', diagnosis);
+
+    if(existing && existing.length > 0){
+
+        alert(
+          `Patient already exists in diagnosis ${diagnosis}`
+        );
+
+        return;
+    }
+
+    const { error } = await client
+        .from('patients')
+.insert({
+    file_no:fileNo,
+    name:name,
+    phone:phone,
+    diagnosis:diagnosis,
+    remarks:remarks,
+    last_update:lastUpdate
+});
+
+    if(error){
+
+        alert(error.message);
+
+        return;
+    }
+
+alert('Patient Added Successfully');
+
+document.getElementById('fileNo').value='';
+document.getElementById('patientName').value='';
+document.getElementById('phone').value='';
+document.getElementById('remarks').value='';
+
+closePatientModal();
+
+await showPatients(diagnosis);
+     await refreshCounts();
+        
+}
+function openDiagnosisModal(){
+    document.getElementById('diagnosisModal').style.display='block';
+}
+
+function closeDiagnosisModal(){
+    document.getElementById('diagnosisModal').style.display='none';
+}
+    async function openDeleteDiagnosisModal(){
+
+    const select =
+        document.getElementById('deleteDiagnosisSelect');
+
+    select.innerHTML = '';
+
+    const { data } = await client
+        .from('diagnoses')
+        .select('*')
+        .order('name');
+
+    data.forEach(item => {
+
+        select.innerHTML += `
+        <option value="${item.id}">
+            ${item.name}
+        </option>
+        `;
+
+    });
+
+    document.getElementById(
+        'deleteDiagnosisModal'
+    ).style.display = 'block';
+}
+
+function closeDeleteDiagnosisModal(){
+
+    document.getElementById(
+        'deleteDiagnosisModal'
+    ).style.display = 'none';
+}
+loadDiagnoses();
+    showAllPatients();
+async function openPatientModal(){
+
+    const today =
+        new Date().toISOString().split('T')[0];
+
+    document.getElementById(
+        'lastUpdate'
+    ).value = today;
+
+    const select =
+        document.getElementById(
+            'patientDiagnosis'
+        );
+
+    select.innerHTML = '';
+
+    const { data } = await client
+        .from('diagnoses')
+        .select('*')
+        .order('name');
+
+data.forEach(item => {
+
+    
+if(item.name === '🔔 Follow Up'){
+    return;
+}
+
+if(
+    item.name === 'Explain' &&
+    sessionStorage.getItem('loggedIn') !== 'zahy'
+){
+    return;
+}
+
+    select.innerHTML += `
+    <option value="${item.name}">
+        ${item.name}
+    </option>
+    `;
+
+});
+
+    document.getElementById(
+        'patientModal'
+    ).style.display='block';
+}
+
+function closePatientModal(){
+
+    document.getElementById(
+        'patientModal'
+    ).style.display='none';
+}
+    async function confirmDeleteDiagnosis(){
+
+    const id =
+        document.getElementById(
+            'deleteDiagnosisSelect'
+        ).value;
+
+    if(!id) return;
+
+    const { error } = await client
+        .from('diagnoses')
+        .delete()
+        .eq('id', id);
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+closeDeleteDiagnosisModal();
+
+await loadDiagnoses();
+
+    alert('Diagnosis deleted successfully');
+}
+    
+async function loadDiagnoses(){
+
+    const { data, error } = await client
+        .from('diagnoses')
+        .select('*')
+        .order('name');
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    const container =
+        document.getElementById('diagnosesContainer');
+
+    const { data: allPatients } = await client
+        .from('patients')
+        .select('id')
+        .not('diagnosis', 'ilike', 'explain');
+
+    const allCount = allPatients?.length || 0;
+
+container.innerHTML = `
+<button
+class="diagnosis-btn active"
+onclick="
+showAllPatients();
+setActiveDiagnosis(this);
+">
+All Patients (<span id="all-count">${allCount}</span>)
+</button>
+`;
+
+   const followUp =
+    data.find(x => x.name === '🔔 Follow Up');
+
+const explain =
+    data.find(x => x.name === 'Explain');
+
+
+if (followUp) {
+
+    const { data: patients } = await client
+        .from('patients')
+        .select('id')
+        .eq('needs_followup', true);
+
+    const count = patients?.length || 0;
+
+    container.innerHTML += `
+    <button
+    class="diagnosis-btn special-followup"
+onclick="
+showFollowUpPatients();
+setActiveDiagnosis(this);
+    ">
+    ${followUp.name} (<span id="followup-count">${count}</span>)
+    </button>
+    `;
+}
+
+
+if (
+    explain &&
+    sessionStorage.getItem('loggedIn') === 'zahy'
+) {
+
+    const { data: patients } = await client
+        .from('patients')
+        .select('id')
+        .eq('diagnosis', explain.name);
+
+    const count = patients?.length || 0;
+
+    container.innerHTML += `
+    <button
+    class="diagnosis-btn special-explain"
+    onclick="
+    showPatients('${explain.name}');
+    setActiveDiagnosis(this);
+    ">
+    ${explain.name} (${count})
+    </button>
+    `;
+}
+const currentUser =
+    sessionStorage.getItem('loggedIn');
+for(const item of data){
+
+    if(
+        item.name === '🔔 Follow Up' ||
+        item.name === 'Explain'
+    ){
+        continue;
+    }
+
+    const { data: patients } = await client
+        .from('patients')
+        .select('id')
+        .eq('diagnosis', item.name);
+
+    const count = patients?.length || 0;
+
+    container.innerHTML += `
+    <button
+    class="diagnosis-btn"
+    onclick="
+    showPatients('${item.name}');
+    setActiveDiagnosis(this);
+    ">
+    ${item.name} (<span id="count-${item.id}">${count}</span>)
+    </button>
+    `;
+}
+
+}
+ async function refreshCounts(){
+
+    const { data: diagnoses } = await client
+        .from('diagnoses')
+        .select('*');
+
+    const { data: allPatients } = await client
+        .from('patients')
+        .select('id')
+        .not('diagnosis', 'ilike', 'explain');
+
+    document.getElementById('all-count').textContent =
+        allPatients?.length || 0;
+
+    const { data: followups } = await client
+        .from('patients')
+        .select('id')
+        .eq('needs_followup', true);
+
+    const followupLabel =
+        document.getElementById('followup-count');
+
+    if(followupLabel){
+        followupLabel.textContent =
+            followups?.length || 0;
+    }
+
+    for(const diagnosis of diagnoses){
+
+        if(
+            diagnosis.name === '🔔 Follow Up' ||
+            diagnosis.name === 'Explain'
+        ){
+            continue;
+        }
+
+        const { data: patients } = await client
+            .from('patients')
+            .select('id')
+            .eq('diagnosis', diagnosis.name);
+
+        const el =
+            document.getElementById(
+                `count-${diagnosis.id}`
+            );
+
+        if(el){
+            el.textContent =
+                patients?.length || 0;
+        }
+    }
+}
+async function addDiagnosis(){
+
+    const name =
+        document.getElementById('diagnosisName')
+        .value
+        .trim();
+
+    if(!name){
+        alert('Enter diagnosis name');
+        return;
+    }
+
+    const { data: existing } = await client
+        .from('diagnoses')
+        .select('id')
+        .ilike('name', name);
+
+    if(existing && existing.length > 0){
+
+
+        alert('Diagnosis already exists');
+
+        return;
+    }
+
+    const { error } = await client
+        .from('diagnoses')
+        .insert({
+            name:name
+        });
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    document.getElementById('diagnosisName').value='';
+
+closeDiagnosisModal();
+
+await loadDiagnoses();
+}
+async function showFollowUpPatients(){
+
+    const { data, error } = await client
+        .from('patients')
+        .select('*')
+        .eq('needs_followup', true);
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    const container =
+        document.getElementById('patientsContainer');
+
+    container.innerHTML = '';
+
+    data.forEach(patient => {
+
+        container.innerHTML += `
+<div
+class="card followup-card"
+data-date="${patient.last_update || ''}"
+>
+
+    <div class="card-top">
+
+
+
+<div>
+    📁 <b>File No:</b> ${patient.file_no}
+
+    ${
+        patient.needs_followup
+        ? `
+        <span class="followup-badge">
+            Follow Up Needed
+        </span>
+        `
+        : ''
+    }
+</div>
+
+
+
+        <div style="display:flex;gap:12px;align-items:center;">
+
+<span
+onclick='sendWhatsApp(${JSON.stringify(patient)})'
+style="
+cursor:pointer;
+font-size:24px;
+color:#25D366;
+"
+title="Send WhatsApp">
+<i class="fa-brands fa-whatsapp"></i>
+</span>
+
+            <span
+            onclick="deletePatient(${patient.id})"
+            style="cursor:pointer;font-size:24px;">
+            🗑️
+            </span>
+
+
+            <span
+            onclick="openEditPatient(${patient.id})"
+            style="cursor:pointer;font-size:24px;">
+            ✏️
+            </span>
+
+            <span
+            class="followup-icon active"
+            style="font-size:24px;"
+            onclick="
+            toggleFollowUp(
+            ${patient.id},
+            '${patient.diagnosis}',
+            ${patient.needs_followup}
+            )">
+            🔔
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="card-row">
+
+        <div>
+            👤 <b>Name:</b><br>
+            ${patient.name}
+        </div>
+
+        <div>
+            📞 <b>Mobile:</b><br>
+            ${patient.phone || '-'}
+        </div>
+
+        <div>
+            🩺 <b>Diagnosis:</b><br>
+            <span class="diagnosis-badge">
+                ${patient.diagnosis}
+            </span>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <div class="card-row">
+
+        <div>
+            📝 <b>Remarks:</b><br>
+            ${patient.remarks || '-'}
+        </div>
+
+        <div>
+            📅 <b>Last Update:</b><br>
+            ${patient.last_update || '-'}
+        </div>
+
+    </div>
+
+</div>
+`;
+    });
+
+}
+    async function showAllPatients(){
+
+    const { data, error } = await client
+        .from('patients')
+        .select('*')
+        .not('diagnosis', 'ilike', 'explain');
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    data.sort(
+        (a,b) =>
+        Number(b.needs_followup)
+        -
+        Number(a.needs_followup)
+    );
+
+    const container =
+        document.getElementById('patientsContainer');
+
+    container.innerHTML = '';
+
+    data.forEach(patient => {
+
+        container.innerHTML += `
+<div
+class="card ${patient.needs_followup ? 'followup-card' : ''}"
+data-date="${patient.last_update || ''}"
+>
+
+    <div class="card-top">
+
+
+
+<div>
+    📁 <b>File No:</b> ${patient.file_no}
+
+    ${
+        patient.needs_followup
+        ? `
+        <span class="followup-badge">
+            Follow Up Needed
+        </span>
+        `
+        : ''
+    }
+</div>
+
+
+
+        <div style="display:flex;gap:12px;align-items:center;">
+<span
+onclick='sendWhatsApp(${JSON.stringify(patient)})'
+style="
+cursor:pointer;
+font-size:24px;
+color:#25D366;
+"
+title="Send WhatsApp">
+<i class="fa-brands fa-whatsapp"></i>
+</span>
+            <span
+            onclick="deletePatient(${patient.id})"
+            style="cursor:pointer;font-size:24px;">
+            🗑️
+            </span>
+
+
+            <span
+            onclick="openEditPatient(${patient.id})"
+            style="cursor:pointer;font-size:24px;">
+            ✏️
+            </span>
+
+            <span
+            class="followup-icon ${patient.needs_followup ? 'active' : ''}"
+            style="font-size:24px;"
+            onclick="
+            toggleFollowUp(
+            ${patient.id},
+            '${patient.diagnosis}',
+            ${patient.needs_followup}
+            )">
+            🔔
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="card-row">
+
+        <div>
+            👤 <b>Name:</b><br>
+            ${patient.name}
+        </div>
+
+        <div>
+            📞 <b>Mobile:</b><br>
+            ${patient.phone || '-'}
+        </div>
+
+        <div>
+            🩺 <b>Diagnosis:</b><br>
+            <span class="diagnosis-badge">
+                ${patient.diagnosis}
+            </span>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <div class="card-row">
+
+        <div>
+            📝 <b>Remarks:</b><br>
+            ${patient.remarks || '-'}
+        </div>
+
+        <div>
+            📅 <b>Last Update:</b><br>
+            ${patient.last_update || '-'}
+        </div>
+
+    </div>
+
+</div>
+`;
+    });
+
+}
+    async function showPatients(diagnosis){
+
+    const { data, error } = await client
+        .from('patients')
+        .select('*')
+        .eq('diagnosis', diagnosis);
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    data.sort(
+        (a,b) =>
+        Number(b.needs_followup)
+        -
+        Number(a.needs_followup)
+    );
+
+    const container =
+        document.getElementById('patientsContainer');
+
+    container.innerHTML = '';
+
+    data.forEach(patient => {
+
+        container.innerHTML += `
+<div
+class="card ${patient.needs_followup ? 'followup-card' : ''}"
+data-date="${patient.last_update || ''}"
+>
+
+    <div class="card-top">
+
+
+
+<div>
+    📁 <b>File No:</b> ${patient.file_no}
+
+    ${
+        patient.needs_followup
+        ? `
+        <span class="followup-badge">
+            Follow Up Needed
+        </span>
+        `
+        : ''
+    }
+</div>
+
+
+
+        <div style="display:flex;gap:12px;align-items:center;">
+<span
+onclick='sendWhatsApp(${JSON.stringify(patient)})'
+style="
+cursor:pointer;
+font-size:24px;
+color:#25D366;
+"
+title="Send WhatsApp">
+<i class="fa-brands fa-whatsapp"></i>
+</span>
+            <span
+            onclick="deletePatient(${patient.id})"
+            style="cursor:pointer;font-size:24px;">
+            🗑️
+            </span>
+
+
+            <span
+            onclick="openEditPatient(${patient.id})"
+            style="cursor:pointer;font-size:24px;">
+            ✏️
+            </span>
+
+            <span
+            class="followup-icon ${patient.needs_followup ? 'active' : ''}"
+            style="font-size:24px;"
+            onclick="
+            toggleFollowUp(
+            ${patient.id},
+            '${patient.diagnosis}',
+            ${patient.needs_followup}
+            )">
+            🔔
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="card-row">
+
+<div>
+    👤 <b>Name:</b><br>
+    ${patient.name}
+</div>
+
+<div>
+    📞 <b>Mobile:</b><br>
+    ${patient.phone || '-'}
+</div>
+
+<div>
+    🩺 <b>Diagnosis:</b><br>
+    <span class="diagnosis-badge">
+        ${patient.diagnosis}
+    </span>
+</div>
+
+</div>
+    <hr>
+
+    <div class="card-row">
+
+
+<div class="card-row">
+
+    <div>
+        📝 <b>Remarks:</b><br>
+        ${patient.remarks || '-'}
+    </div>
+
+    <div>
+        📅 <b>Last Update:</b><br>
+        ${patient.last_update || '-'}
+    </div>
+
+</div>
+
+
+        
+
+    </div>
+
+</div>
+`;
+    });
+
+}
+async function deleteDiagnosis(id){
+
+    if(!confirm('Delete Diagnosis ?')){
+        return;
+    }
+
+    const { error } = await client
+        .from('diagnoses')
+        .delete()
+        .eq('id', id);
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+   await loadDiagnoses();
+await showAllPatients();
+
+}
+async function deletePatient(id){
+
+    if(!confirm('Delete this patient ?')){
+        return;
+    }
+
+    const { error } = await client
+        .from('patients')
+        .delete()
+        .eq('id', id);
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    alert('Patient deleted successfully');
+
+await showAllPatients();
+await refreshCounts();
+
+setTimeout(() => {
+    document
+        .querySelector('.diagnosis-btn')
+        ?.classList.add('active');
+}, 300);
+
+}
+    async function openEditPatient(id){
+
+    const { data } = await client
+        .from('patients')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    document.getElementById('editPatientId').value =
+        data.id;
+
+    document.getElementById('editFileNo').value =
+        data.file_no;
+
+document.getElementById('editPatientName').value =
+data.name;
+
+document.getElementById('editPhone').value =
+data.phone || '';
+
+    document.getElementById('editRemarks').value =
+        data.remarks || '';
+
+    document.getElementById('editLastUpdate').value =
+        new Date().toISOString().split('T')[0];
+
+    const select =
+        document.getElementById('editDiagnosis');
+
+    select.innerHTML='';
+
+    const { data: diagnoses } = await client
+        .from('diagnoses')
+        .select('*')
+        .order('name');
+
+diagnoses.forEach(item => {
+
+if(item.name === '🔔 Follow Up'){
+    return;
+}
+
+if(
+    item.name === 'Explain' &&
+    sessionStorage.getItem('loggedIn') !== 'zahy'
+){
+    return;
+}
+
+       
+
+    select.innerHTML += `
+    <option value="${item.name}">
+    ${item.name}
+    </option>
+    `;
+
+});
+
+    select.value = data.diagnosis;
+
+    document.getElementById(
+        'editPatientModal'
+    ).style.display='block';
+}
+
+function closeEditPatientModal(){
+
+    document.getElementById(
+        'editPatientModal'
+    ).style.display='none';
+}
+
+async function updatePatient(){
+
+    const id =
+        document.getElementById(
+            'editPatientId'
+        ).value;
+
+    const { error } = await client
+        .from('patients')
+        .update({
+
+            file_no:
+                document.getElementById(
+                    'editFileNo'
+                ).value,
+
+name:
+document.getElementById(
+'editPatientName'
+).value,
+
+phone:
+document.getElementById(
+'editPhone'
+).value,
+
+            diagnosis:
+                document.getElementById(
+                    'editDiagnosis'
+                ).value,
+
+            remarks:
+                document.getElementById(
+                    'editRemarks'
+                ).value,
+
+            last_update:
+                document.getElementById(
+                    'editLastUpdate'
+                ).value
+
+        })
+        .eq('id', id);
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    alert('Patient updated');
+
+    closeEditPatientModal();
+
+
+await showAllPatients();
+ await refreshCounts();
+}
+</script>
+<div id="editPatientModal" class="modal">
+
+    <div class="modal-content" style="width:550px;">
+
+        <h2>Edit Patient</h2>
+
+        <input type="hidden" id="editPatientId">
+
+        <label>File No:</label>
+        <input id="editFileNo">
+
+        <br><br>
+
+<label>Name:</label>
+<input id="editPatientName">
+
+<br><br>
+
+<label>Mobile:</label>
+<input id="editPhone">
+
+<br><br>
+
+<label>Diagnosis:</label>
+       <select
+id="editDiagnosis"
+style="width:100%;padding:12px;">
+</select>
+
+        <br><br>
+
+        <label>Remarks:</label>
+        <textarea
+        id="editRemarks"
+        style="width:100%;height:70px;"></textarea>
+
+        <br><br>
+
+        <label>Last Update:</label>
+        <input
+        id="editLastUpdate"
+        type="date">
+
+        <div class="modal-actions">
+
+            <button
+            class="add"
+            onclick="updatePatient()">
+            Save
+            </button>
+
+            <button
+            class="delete"
+            onclick="closeEditPatientModal()">
+            Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

@@ -878,16 +878,16 @@ Logout
 
     <div class="modal-content" style="width:550px;">
 
-        <h2>File Entry</h2>
-
-<label>File No:</label>
-<input id="fileNo">
-     <div style="
-margin-top:12px;
+        <div style="
 display:flex;
+justify-content:space-between;
 align-items:center;
-justify-content:flex-end;
+margin-bottom:20px;
 ">
+
+<h2 style="margin:0;">
+File Entry
+</h2>
 
 <label style="
 display:flex;
@@ -902,7 +902,7 @@ border:1px solid #ffcc80;
 
 border-radius:999px;
 
-font-size:14px;
+font-size:15px;
 
 font-weight:700;
 
@@ -917,8 +917,8 @@ id="needsFollowup"
 style="
 width:18px;
 height:18px;
-accent-color:#ff8c1a;
 margin:0;
+accent-color:#ff8c1a;
 ">
 
 🔔 Follow Up
@@ -927,6 +927,8 @@ margin:0;
 
 </div>
 
+<label>File No:</label>
+<input id="fileNo">
 <br><br>
 
 <label>Name:</label>
@@ -2534,6 +2536,10 @@ data.name;
 
 document.getElementById('editPhone').value =
 data.phone || '';
+     document.getElementById(
+    'editNeedsFollowup'
+).checked =
+    data.needs_followup || false;
 
     document.getElementById('editRemarks').value =
         data.remarks || '';
@@ -2613,7 +2619,19 @@ phone:
 document.getElementById(
 'editPhone'
 ).value,
+needs_followup:
+document.getElementById(
+    'editNeedsFollowup'
+).checked,
 
+original_diagnosis:
+document.getElementById(
+    'editNeedsFollowup'
+).checked
+? document.getElementById(
+    'editDiagnosis'
+).value
+: null,
             diagnosis:
                 document.getElementById(
                     'editDiagnosis'
@@ -2650,7 +2668,54 @@ await showAllPatients();
 
     <div class="modal-content" style="width:550px;">
 
-        <h2>Edit Patient</h2>
+        <div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+">
+
+<h2 style="margin:0;">
+Edit Patient
+</h2>
+
+<label style="
+display:flex;
+align-items:center;
+gap:8px;
+
+padding:8px 14px;
+
+background:#fff4e5;
+
+border:1px solid #ffcc80;
+
+border-radius:999px;
+
+font-size:15px;
+
+font-weight:700;
+
+color:#ff8c1a;
+
+cursor:pointer;
+">
+
+<input
+type="checkbox"
+id="editNeedsFollowup"
+style="
+width:18px;
+height:18px;
+margin:0;
+accent-color:#ff8c1a;
+">
+
+🔔 Follow Up
+
+</label>
+
+</div>
 
         <input type="hidden" id="editPatientId">
 
@@ -2690,14 +2755,8 @@ style="width:100%;padding:12px;">
         type="date">
 <br><br>
 
-<label style="display:flex;align-items:center;gap:10px;">
-    <input
-        type="checkbox"
-        id="needsFollowup"
-        style="width:auto;"
-    >
-    Follow Up Needed
-</label>
+
+
         <div class="modal-actions">
 
             <button

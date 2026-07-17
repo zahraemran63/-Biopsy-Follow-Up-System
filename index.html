@@ -208,6 +208,34 @@ console.log('ExcelJS =', typeof ExcelJS);
 
     border-radius:20px 20px 0 0;
 }
+ .completed-card{
+    background:linear-gradient(
+        135deg,
+        #eefbf1,
+        #e4f7ea
+    );
+
+    box-shadow:
+        0 10px 25px rgba(25,135,84,.15);
+}
+
+.completed-card::before{
+    background:linear-gradient(
+        180deg,
+        #198754,
+        #20c997
+    );
+}
+
+.completed-card .card-top{
+    background:linear-gradient(
+        180deg,
+        #e9f9ee,
+        #ddf6e5
+    );
+
+    border-bottom:2px solid #9ed5b3;
+}
  .card-item{
     display:flex;
     flex-direction:column;
@@ -333,8 +361,8 @@ console.log('ExcelJS =', typeof ExcelJS);
 }
 
 .followup-icon.active{
-    color:#ff8c1a;
-    text-shadow:0 0 8px rgba(255,140,26,.35);
+    color:#198754;
+    text-shadow:0 0 8px rgba(25,135,84,.35);
 }
 
 .followup-icon:hover{
@@ -846,7 +874,13 @@ class="diagnosis-btn special-followup"
 onclick="showFollowUpPatients()">
     Follow Up (0)
 </button>
-
+      
+<button
+id="completedBtn"
+class="diagnosis-btn"
+onclick="showCompletedPatients()">
+    Completed (0)
+</button>
 </div>
     <div id="patientsContainer"></div>
     <div id="patientModal" class="modal">
@@ -1031,7 +1065,25 @@ console.log(client);
     searchPatients();
 }
     async function toggleFollowUp(id, needsFollowup){
+if(needsFollowup){
 
+    const { error } = await client
+        .from('patients')
+        .update({
+            completed: true,
+            needs_followup: false
+        })
+        .eq('id', id);
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    await showAllPatients();
+    await refreshCounts();
+    return;
+}
     if(!needsFollowup){
 
         const { error } = await client
@@ -1678,11 +1730,21 @@ function closePatientModal(){
 
     
 async function refreshCounts(){
+ const { data: completed } =
+    await client
+    .from('patients')
+    .select('id')
+    .eq('completed', true);
+ document.getElementById(
+    'completedBtn'
+).innerHTML =
+    `Completed (${completed?.length || 0})`;
 
     const { data: allPatients } =
-        await client
-        .from('patients')
-        .select('id');
+    await client
+    .from('patients')
+    .select('id')
+    .eq('completed', false);
 
     const { data: followups } =
         await client
@@ -1709,7 +1771,8 @@ document.getElementById('allPatientsBtn')
     const { data, error } = await client
         .from('patients')
         .select('*')
-        .eq('needs_followup', true);
+        .eq('needs_followup', true)
+.eq('completed', false);
 
     if(error){
         alert(error.message);
@@ -1783,7 +1846,10 @@ toggleFollowUp(
 ${patient.id},
 ${patient.needs_followup}
 )">
-            🔔
+            ${patient.needs_followup
+    ? '<i class="fa-solid fa-check-double"></i>'
+    : '🔔'
+}
             </span>
 
         </div>
@@ -1826,6 +1892,80 @@ ${patient.needs_followup}
     });
 
 }
+async function showCompletedPatients(){
+
+    document.getElementById('completedBtn')
+        .classList.add('active');
+
+    document.getElementById('allPatientsBtn')
+        .classList.remove('active');
+
+    document.getElementById('followUpBtn')
+        .classList.remove('active');
+
+    const { data, error } = await client
+        .from('patients')
+        .select('*')
+        .eq('completed', true);
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    const container =
+        document.getElementById('patientsContainer');
+
+    container.innerHTML = '';
+
+    data.forEach(patient => {
+
+        container.innerHTML += `
+<div class="card completed-card">
+
+    <div class="card-top">
+        <div>
+            <i class="fa-solid fa-check-double"></i>
+            <b> Completed</b>
+            &nbsp;&nbsp;
+            <b>File No:</b> ${patient.file_no}
+        </div>
+    </div>
+
+    <div class="card-row">
+
+        <div>
+            👤 <b>Name:</b><br>
+            ${patient.name}
+        </div>
+
+        <div>
+            📞 <b>Mobile:</b><br>
+            ${patient.phone || '-'}
+        </div>
+
+    </div>
+
+    <hr>
+
+    <div class="card-row">
+
+        <div>
+            📝 <b>Remarks:</b><br>
+            ${patient.remarks || '-'}
+        </div>
+
+        <div>
+            📅 <b>Last Update:</b><br>
+            ${patient.last_update || '-'}
+        </div>
+
+    </div>
+
+</div>
+`;
+    });
+}
     async function showAllPatients(){
      
 document.getElementById('allPatientsBtn')
@@ -1836,7 +1976,8 @@ document.getElementById('followUpBtn')
      
 const { data, error } = await client
     .from('patients')
-    .select('*');
+    .select('*')
+.eq('completed', false);
 
 console.log(data);
      
@@ -1917,7 +2058,11 @@ toggleFollowUp(
 ${patient.id},
 ${patient.needs_followup}
 )">
-            🔔
+
+${patient.needs_followup
+    ? '<i class="fa-solid fa-check-double"></i>'
+    : '🔔'
+}
             </span>
 
         </div>

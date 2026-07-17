@@ -1934,8 +1934,37 @@ ${patient.needs_followup}
     });
 
 }
-async function showCompletedPatients(){
+ async function restorePatient(id){
 
+    const { error } = await client
+        .from('patients')
+        .update({
+            completed: false,
+            needs_followup: false
+        })
+        .eq('id', id);
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    await showCompletedPatients();
+    await refreshCounts();
+}
+async function showCompletedPatients(){
+ 
+<span
+onclick="restorePatient(${patient.id})"
+style="
+cursor:pointer;
+font-size:24px;
+color:#0d6efd;
+"
+title="Restore">
+<i class="fa-solid fa-rotate-left"></i>
+</span>
+ 
     document.getElementById('completedBtn')
         .classList.add('active');
 

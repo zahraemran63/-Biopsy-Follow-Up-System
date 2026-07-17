@@ -1163,7 +1163,7 @@ await refreshCounts();
 }
     
 
-async function exportExcel() {
+async function exportExcel(){
 
     const btn =
         document.getElementById('exportBtn');
@@ -1171,185 +1171,103 @@ async function exportExcel() {
     btn.disabled = true;
     btn.innerHTML = '⏳ Exporting...';
 
-    try {
+    try{
 
         const workbook =
             new ExcelJS.Workbook();
 
-        workbook.creator =
-            'Biopsy Follow Up System';
-
-        workbook.created =
-            new Date();
-
         const summarySheet =
-            workbook.addWorksheet(
-                'Summary'
-            );
+            workbook.addWorksheet('Summary');
+
+        const { data: allPatients } =
+            await client
+                .from('patients')
+                .select('*');
+
+        const { data: followUpPatients } =
+            await client
+                .from('patients')
+                .select('*')
+                .eq('needs_followup', true)
+                .eq('completed', false);
+
+        const { data: completedPatients } =
+            await client
+                .from('patients')
+                .select('*')
+                .eq('completed', true);
 
         summarySheet.columns = [
             {
-                header: 'Diagnosis',
-                key: 'diagnosis',
-                width: 40
+                header:'Category',
+                key:'category',
+                width:30
             },
             {
-                header: 'Patients',
-                key: 'count',
-                width: 20
+                header:'Count',
+                key:'count',
+                width:20
             }
         ];
 
-        summarySheet.getRow(1).eachCell(cell => {
-
-            cell.font = {
-                bold: true,
-                color: {
-                    argb: 'FFFFFFFF'
-                }
-            };
-
-            cell.fill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: {
-                    argb: '1F4E78'
-                }
-            };
-
-            cell.border = {
-                top: { style:'thin' },
-                left:{ style:'thin' },
-                bottom:{ style:'thin' },
-                right:{ style:'thin' }
-            };
-
+        summarySheet.addRow({
+            category:'Total Patients',
+            count:allPatients.length
         });
 
-        const { data: diagnoses } =
-            await client
-                .from('diagnoses')
-                .select('*')
-                .order('name');
+        summarySheet.addRow({
+            category:'Total Follow Up',
+            count:followUpPatients.length
+        });
 
-        for (const diag of diagnoses) {
+        summarySheet.addRow({
+            category:'Total Completed',
+            count:completedPatients.length
+        });
 
-if(
-    diag.name === 'Explain' ||
-    diag.name === '🔔 Follow Up'
-){
-    continue;
-}
-
-
-
-            const {
-                data: patients
-            } = await client
-                .from('patients')
-                .select('*')
-                .eq(
-                    'diagnosis',
-                    diag.name
-                )
-                .order('file_no');
-
-            summarySheet.addRow({
-                diagnosis: diag.name,
-                count: patients.length
-            });
+        function createPatientsSheet(
+            sheetName,
+            patients
+        ){
 
             const sheet =
-                workbook.addWorksheet(
-                    diag.name.substring(0,31)
-                );
-
-            sheet.mergeCells('A1:E1');
-
-            sheet.getCell('A1').value =
-                'BIOPSY FOLLOW UP SYSTEM';
-
-            sheet.getCell('A1').font = {
-                size:18,
-                bold:true,
-                color:{
-                    argb:'FFFFFFFF'
-                }
-            };
-
-            sheet.getCell('A1').alignment = {
-                horizontal:'center'
-            };
-
-            sheet.getCell('A1').fill = {
-                type:'pattern',
-                pattern:'solid',
-                fgColor:{
-                    argb:'1F4E78'
-                }
-            };
-
-            sheet.mergeCells('A2:E2');
-
-            sheet.getCell('A2').value =
-                `Diagnosis: ${diag.name}`;
-
-            sheet.mergeCells('A3:E3');
-
-            sheet.getCell('A3').value =
-                `Total Patients: ${patients.length}`;
-
-            sheet.mergeCells('A4:E4');
-
-            sheet.getCell('A4').value =
-                `Export Date: ${new Date().toLocaleDateString()}`;
+                workbook.addWorksheet(sheetName);
 
             sheet.columns = [
-{
-header:'S.No',
-key:'no',
-width:10
-},
-{
-header:'MRN',
-key:'mrn',
-width:20
-},
-{
-header:'Name',
-key:'name',
-width:35
-},
-{
-header:'Mobile',
-key:'phone',
-width:25
-},
-{
-header:'Remark',
-key:'remark',
-width:50
-},
-{
-header:'Last Update',
-key:'update',
-width:20
-}
-];
 
-            const headerRow =
-                sheet.getRow(6);
+                {
+                    header:'File No',
+                    key:'file',
+                    width:20
+                },
 
-            headerRow.values = [
-'S.No',
-'MRN',
-'Name',
-'Mobile',
-'Remark',
-'Last Update'
-];
+                {
+                    header:'Name',
+                    key:'name',
+                    width:35
+                },
 
-            headerRow.eachCell(cell => {
+                {
+                    header:'Mobile',
+                    key:'phone',
+                    width:25
+                },
+
+                {
+                    header:'Remarks',
+                    key:'remarks',
+                    width:50
+                },
+
+                {
+                    header:'Last Update',
+                    key:'update',
+                    width:20
+                }
+
+            ];
+
+            sheet.getRow(1).eachCell(cell => {
 
                 cell.font = {
                     bold:true,
@@ -1362,142 +1280,54 @@ width:20
                     type:'pattern',
                     pattern:'solid',
                     fgColor:{
-                        argb:'4472C4'
+                        argb:'1F4E78'
                     }
                 };
 
-                cell.alignment = {
-                    horizontal:'center'
-                };
-
-                cell.border = {
-                    top:{style:'thin'},
-                    left:{style:'thin'},
-                    bottom:{style:'thin'},
-                    right:{style:'thin'}
-                };
-
             });
 
-            patients.forEach(
-                (patient,index) => {
+            patients.forEach(patient => {
 
-                const row =
-sheet.addRow({
+                sheet.addRow({
 
-    no:index+1,
+                    file:
+                        patient.file_no || '',
 
-    mrn:
-        patient.file_no || '',
+                    name:
+                        patient.name || '',
 
-    name:
-        patient.name || '',
+                    phone:
+                        patient.phone || '',
 
-    phone:
-        patient.phone || '',
+                    remarks:
+                        patient.remarks || '',
 
-    remark:
-        patient.remarks || '',
-
-    update:
-        patient.last_update || ''
-
-});
-
-                row.eachCell(cell => {
-
-                    cell.border = {
-                        top:{style:'thin'},
-                        left:{style:'thin'},
-                        bottom:{style:'thin'},
-                        right:{style:'thin'}
-                    };
+                    update:
+                        patient.last_update || ''
 
                 });
 
-                if(index % 2 === 0){
-
-                    row.eachCell(cell => {
-
-                        cell.fill = {
-                            type:'pattern',
-                            pattern:'solid',
-                            fgColor:{
-                                argb:'F3F6FA'
-                            }
-                        };
-
-                    });
-                }
-
             });
 
-            sheet.views = [
-                {
-                    state:'frozen',
-                    ySplit:6
-                }
-            ];
-
-            sheet.autoFilter = {
-from:'A6',
-to:'F6'
-};
         }
-summarySheet.addRow([]);
 
-const totalRow1 = summarySheet.addRow({
-    diagnosis: 'Total Diagnoses',
-    count: diagnoses.filter(
-        d =>
-        d.name !== 'Explain' &&
-        d.name !== '🔔 Follow Up'
-    ).length
-});
+        createPatientsSheet(
+            'All Patients',
+            allPatients.filter(
+                p => !p.completed
+            )
+        );
 
-const { count: totalPatientsCount } =
-    await client
-        .from('patients')
-        .select('id', {
-            count: 'exact',
-            head: true
-        });
+        createPatientsSheet(
+            'Follow Up',
+            followUpPatients
+        );
 
-const totalRow2 = summarySheet.addRow({
-    diagnosis: 'Total Patients',
-    count: totalPatientsCount || 0
-});
+        createPatientsSheet(
+            'Completed',
+            completedPatients
+        );
 
-
-[totalRow1, totalRow2].forEach(row => {
-
-    row.eachCell(cell => {
-
-        cell.font = {
-            bold: true,
-            color: {
-                argb: 'FFFFFFFF'
-            }
-        };
-
-        cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: {
-                argb: '1F4E78'
-            }
-        };
-
-        cell.border = {
-            top: { style:'thin' },
-            left:{ style:'thin' },
-            bottom:{ style:'thin' },
-            right:{ style:'thin' }
-        };
-
-    });
-
-});
         const buffer =
             await workbook.xlsx.writeBuffer();
 
@@ -1513,16 +1343,15 @@ const totalRow2 = summarySheet.addRow({
         const link =
             document.createElement('a');
 
-        const today =
-            new Date()
-            .toISOString()
-            .split('T')[0];
-
         link.href =
             URL.createObjectURL(blob);
 
         link.download =
-            `Biopsy_Follow_Up_${today}.xlsx`;
+            `Biopsy_Report_${
+                new Date()
+                .toISOString()
+                .split('T')[0]
+            }.xlsx`;
 
         link.click();
 
@@ -1535,11 +1364,12 @@ const totalRow2 = summarySheet.addRow({
     finally{
 
         btn.disabled = false;
+        btn.innerHTML = '📊 Export Excel';
 
-        btn.innerHTML =
-            '📊 Export Excel';
     }
+
 }
+ 
     async function importExcel(event){
         if(typeof XLSX === 'undefined'){
     alert('XLSX Library Not Loaded');

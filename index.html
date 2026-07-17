@@ -190,6 +190,50 @@ console.log('ExcelJS =', typeof ExcelJS);
 
 
 <style>
+ .overdue-alert{
+
+    position:fixed;
+
+    top:85px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    z-index:9999;
+
+    background:#dc3545;
+
+    color:white;
+
+    padding:14px 25px;
+
+    border-radius:14px;
+
+    font-weight:700;
+
+    font-size:16px;
+
+    box-shadow:
+        0 8px 25px rgba(220,53,69,.35);
+
+    animation:
+        shake 1s infinite;
+}
+
+@keyframes shake{
+
+    0% { transform:translateX(-50%) rotate(0deg); }
+
+    25% { transform:translateX(calc(-50% - 3px)) rotate(-1deg); }
+
+    50% { transform:translateX(calc(-50% + 3px)) rotate(1deg); }
+
+    75% { transform:translateX(calc(-50% - 3px)) rotate(-1deg); }
+
+    100% { transform:translateX(-50%) rotate(0deg); }
+
+}
  .card:not(.followup-card){
     background:#f8fbff;
 }
@@ -772,6 +816,12 @@ button{
 </div>
 
 <div id="welcomeUser"></div>
+     <div
+id="overdueAlert"
+class="overdue-alert"
+style="display:none;">
+</div>
+     
         <button
 id="logoutBtn"
 onclick="logout()"
@@ -1105,6 +1155,54 @@ console.log(client);
 
     searchPatients();
 }
+ async function checkOverduePatients(){
+
+    const { data } = await client
+        .from('patients')
+        .select('*')
+        .eq('completed', false);
+
+    const today = new Date();
+
+    const overduePatients =
+        data.filter(patient => {
+
+            if(!patient.last_update)
+                return false;
+
+            const updateDate =
+                new Date(patient.last_update);
+
+            const diffDays =
+                Math.floor(
+                    (today - updateDate)
+                    /
+                    (1000 * 60 * 60 * 24)
+                );
+
+            return diffDays >= 1;
+        });
+
+    const alertBox =
+        document.getElementById(
+            'overdueAlert'
+        );
+
+    if(overduePatients.length > 0){
+
+        alertBox.style.display =
+            'block';
+
+        alertBox.innerHTML =
+            `⚠️ ${overduePatients.length} patient(s) require update`;
+    }
+    else{
+
+        alertBox.style.display =
+            'none';
+    }
+
+}
     async function toggleFollowUp(id, needsFollowup){
 if(needsFollowup){
 
@@ -1123,6 +1221,7 @@ if(needsFollowup){
 
     await showAllPatients();
     await refreshCounts();
+ await checkOverduePatients();
     return;
 }
     if(!needsFollowup){
@@ -1159,6 +1258,7 @@ if(needsFollowup){
    
 await showAllPatients();
 await refreshCounts();
+     await checkOverduePatients();
      
 }
     
@@ -1796,8 +1896,8 @@ document.getElementById('remarks').value='';
 closePatientModal();
 
 await showAllPatients();
-     await refreshCounts();
-        
+await refreshCounts();
+await checkOverduePatients();
 }
 
     async function openPatientModal(){
@@ -2008,7 +2108,8 @@ ${patient.needs_followup}
     }
 
     await showCompletedPatients();
-    await refreshCounts();
+await refreshCounts();
+await checkOverduePatients();
 }
 async function showCompletedPatients(){
  
@@ -2265,6 +2366,7 @@ async function deletePatient(id){
 
 await showAllPatients();
 await refreshCounts();
+await checkOverduePatients();
 
 }
     async function openEditPatient(id){
@@ -2367,7 +2469,8 @@ original_diagnosis: null,
 
 
 await showAllPatients();
- await refreshCounts();
+await refreshCounts();
+await checkOverduePatients();
 }
  window.addEventListener('load', async () => {
 
@@ -2375,7 +2478,10 @@ await showAllPatients();
 
     await refreshCounts();
 
+    await checkOverduePatients();
+
 });
+
 </script>
 <div id="editPatientModal" class="modal">
 

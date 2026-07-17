@@ -226,7 +226,49 @@ console.log('ExcelJS =', typeof ExcelJS);
         #20c997
     );
 }
+.card.completed-card{
 
+    background:
+    linear-gradient(
+        135deg,
+        #f2fbf6,
+        #e8f8ef
+    );
+
+    box-shadow:
+        0 10px 25px rgba(25,135,84,.15);
+}
+
+.completed-card .card-top{
+
+    background:
+    linear-gradient(
+        180deg,
+        #e4f7ea,
+        #d8f1e1
+    );
+
+    margin:-16px -20px 15px -14px;
+
+    padding:16px 20px 12px 20px;
+
+    border-bottom:2px solid #8fd1a9;
+}
+
+.card.completed-card::before{
+
+    background:
+    linear-gradient(
+        180deg,
+        #198754,
+        #20c997
+    );
+}
+
+.card.completed-card::after{
+
+    color:rgba(25,135,84,.08);
+}
 .completed-card .card-top{
     background:linear-gradient(
         180deg,

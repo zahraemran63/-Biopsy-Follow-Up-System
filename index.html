@@ -1823,10 +1823,10 @@ ${patient.needs_followup}
 }
     async function showAllPatients(){
 
-    const { data, error } = await client
-        .from('patients')
-        .select('*')
-        .not('diagnosis', 'ilike', 'explain');
+const { data, error } = await client
+    .from('patients')
+    .select('*')
+    .not('diagnosis', 'ilike', 'explain');
 
     if(error){
         alert(error.message);

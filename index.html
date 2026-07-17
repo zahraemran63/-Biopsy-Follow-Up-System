@@ -348,12 +348,7 @@ console.log('ExcelJS =', typeof ExcelJS);
     border:2px solid #146c43;
     box-shadow:0 4px 12px rgba(25,135,84,.35);
 }
-#diagnosesContainer{
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    margin-top:20px;
-}
+
 
 .diagnosis-btn{
     background:#0d6efd;
@@ -808,14 +803,6 @@ Logout
             + Add Patient
         </button>
 
-        <button class="add" onclick="openDiagnosisModal()">
-            + Add Diagnosis
-        </button>
-
-        <button class="delete" onclick="openDeleteDiagnosisModal()">
-            - Delete Diagnosis
-        </button>
-
         <button
             id="importBtn"
             class="add"
@@ -838,41 +825,37 @@ Logout
         accept=".xlsx,.xls"
         style="display:none"
         onchange="importExcel(event)">
-</div>
-
-<div id="deleteDiagnosisModal" class="modal">
-
-    <div class="modal-content">
-
-        <h2>Delete Diagnosis</h2>
-
-        <select
-        id="deleteDiagnosisSelect"
-        style="width:100%;padding:12px;">
-
-        </select>
-
-        <div class="modal-actions">
-
-            <button
-            class="delete"
-            onclick="confirmDeleteDiagnosis()">
-            OK
-            </button>
-
-            <button
-            class="add"
-            onclick="closeDeleteDiagnosisModal()">
-            Cancel
-            </button>
 
         </div>
+<div style="
+display:flex;
+gap:15px;
+margin-bottom:20px;
+">
 
+    <div style="
+    background:#0d6efd;
+    color:white;
+    padding:15px;
+    border-radius:12px;
+    min-width:180px;
+    ">
+        Patients:
+        <span id="all-count">0</span>
+    </div>
+
+    <div style="
+    background:#ff8c1a;
+    color:white;
+    padding:15px;
+    border-radius:12px;
+    min-width:180px;
+    ">
+        Follow Up:
+        <span id="followup-count">0</span>
     </div>
 
 </div>
-
-<div id="diagnosesContainer"></div>
     <div id="patientsContainer"></div>
     <div id="patientModal" class="modal">
 
@@ -941,13 +924,6 @@ accent-color:#ff8c1a;
 
 <br><br>
 
-<label>Diagnosis:</label>
-<select
-id="patientDiagnosis"
-style="width:100%;padding:12px;">
-</select>
-
-<br><br>
 
 <label>Remarks:</label>
 <textarea
@@ -980,35 +956,6 @@ type="date">
 
     </div>
 
-</div>
-    <div id="diagnosisModal" class="modal">
-
-    <div class="modal-content">
-
-        <h2>Add New Diagnosis</h2>
-
-        <input
-        id="diagnosisName"
-        placeholder="Diagnosis Name"
-        >
-
-        <div class="modal-actions">
-
-            <button
-            class="add"
-            onclick="addDiagnosis()">
-            Save
-            </button>
-
-            <button
-            class="delete"
-            onclick="closeDiagnosisModal()">
-            Cancel
-            </button>
-
-        </div>
-
-    </div>
 
 </div>
 
@@ -1077,16 +1024,6 @@ const client = window.supabase.createClient(
 );
 console.log(client);
     console.log(typeof XLSX);
-    function setActiveDiagnosis(button){
-
-    document
-        .querySelectorAll('.diagnosis-btn')
-        .forEach(btn => {
-            btn.classList.remove('active');
-        });
-
-    button.classList.add('active');
-}
  
  function setDateSearch(date){
 
@@ -1101,16 +1038,15 @@ console.log(client);
 
     searchPatients();
 }
-    async function toggleFollowUp(id, currentDiagnosis, needsFollowup){
+    async function toggleFollowUp(id, needsFollowup){
 
     if(!needsFollowup){
 
         const { error } = await client
             .from('patients')
-            .update({
-                needs_followup: true,
-                original_diagnosis: currentDiagnosis
-            })
+.update({
+    needs_followup: true
+})
             .eq('id', id);
 
         if(error){
@@ -1440,13 +1376,13 @@ const { count: totalPatientsCount } =
         .select('id', {
             count: 'exact',
             head: true
-        })
-        .not('diagnosis', 'ilike', 'explain');
+        });
 
 const totalRow2 = summarySheet.addRow({
     diagnosis: 'Total Patients',
     count: totalPatientsCount || 0
 });
+
 
 [totalRow1, totalRow2].forEach(row => {
 
@@ -1625,7 +1561,7 @@ last_update:lastUpdate || null
             }
         }
 
-        await loadDiagnoses();
+      
 
         await showAllPatients();
 
@@ -1661,8 +1597,6 @@ document.getElementById('patientName').value.trim();
 const phone =
 document.getElementById('phone').value.trim();
 
-const diagnosis =
-document.getElementById('patientDiagnosis').value;
      const needsFollowup =
 document.getElementById('needsFollowup').checked;
 
@@ -1683,13 +1617,11 @@ document.getElementById('needsFollowup').checked;
         .from('patients')
         .select('id')
         .eq('file_no', fileNo)
-        .eq('diagnosis', diagnosis);
+
 
     if(existing && existing.length > 0){
 
-        alert(
-          `Patient already exists in diagnosis ${diagnosis}`
-        );
+alert('Patient already exists');
 
         return;
     }
@@ -1700,16 +1632,12 @@ const { error } = await client
         file_no: fileNo,
         name: name,
         phone: phone,
-        diagnosis: diagnosis,
         remarks: remarks,
         last_update: lastUpdate,
 
         needs_followup: needsFollowup,
 
-        original_diagnosis:
-            needsFollowup
-            ? diagnosis
-            : null
+        original_diagnosis: null
     });
 
     if(error){
@@ -1729,98 +1657,22 @@ document.getElementById('remarks').value='';
 
 closePatientModal();
 
-await showPatients(diagnosis);
+await showAllPatients();
      await refreshCounts();
         
 }
-function openDiagnosisModal(){
-    document.getElementById('diagnosisModal').style.display='block';
-}
 
-function closeDiagnosisModal(){
-    document.getElementById('diagnosisModal').style.display='none';
-}
-    async function openDeleteDiagnosisModal(){
-
-    const select =
-        document.getElementById('deleteDiagnosisSelect');
-
-    select.innerHTML = '';
-
-    const { data } = await client
-        .from('diagnoses')
-        .select('*')
-        .order('name');
-
-    data.forEach(item => {
-
-        select.innerHTML += `
-        <option value="${item.id}">
-            ${item.name}
-        </option>
-        `;
-
-    });
-
-    document.getElementById(
-        'deleteDiagnosisModal'
-    ).style.display = 'block';
-}
-
-function closeDeleteDiagnosisModal(){
-
-    document.getElementById(
-        'deleteDiagnosisModal'
-    ).style.display = 'none';
-}
-loadDiagnoses();
-    showAllPatients();
-async function openPatientModal(){
+    async function openPatientModal(){
 
     const today =
         new Date().toISOString().split('T')[0];
 
-    document.getElementById(
-        'lastUpdate'
-    ).value = today;
-
-    const select =
-        document.getElementById(
-            'patientDiagnosis'
-        );
-
-    select.innerHTML = '';
-
-    const { data } = await client
-        .from('diagnoses')
-        .select('*')
-        .order('name');
-
-data.forEach(item => {
-
-    
-if(item.name === '🔔 Follow Up'){
-    return;
-}
-
-if(
-    item.name === 'Explain' &&
-    sessionStorage.getItem('loggedIn') !== 'zahy'
-){
-    return;
-}
-
-    select.innerHTML += `
-    <option value="${item.name}">
-        ${item.name}
-    </option>
-    `;
-
-});
+    document.getElementById('lastUpdate').value =
+        today;
 
     document.getElementById(
         'patientModal'
-    ).style.display='block';
+    ).style.display = 'block';
 }
 
 function closePatientModal(){
@@ -1829,241 +1681,32 @@ function closePatientModal(){
         'patientModal'
     ).style.display='none';
 }
-    async function confirmDeleteDiagnosis(){
 
-    const id =
-        document.getElementById(
-            'deleteDiagnosisSelect'
-        ).value;
 
-    if(!id) return;
 
-    const { error } = await client
-        .from('diagnoses')
-        .delete()
-        .eq('id', id);
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-closeDeleteDiagnosisModal();
-
-await loadDiagnoses();
-
-    alert('Diagnosis deleted successfully');
-}
     
-async function loadDiagnoses(){
+async function refreshCounts(){
 
-    const { data, error } = await client
-        .from('diagnoses')
-        .select('*')
-        .order('name');
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    const container =
-        document.getElementById('diagnosesContainer');
-
-    const { data: allPatients } = await client
+    const { data: allPatients } =
+        await client
         .from('patients')
-        .select('id')
-        .not('diagnosis', 'ilike', 'explain');
+        .select('id');
 
-    const allCount = allPatients?.length || 0;
-
-container.innerHTML = `
-<button
-class="diagnosis-btn active"
-onclick="
-showAllPatients();
-setActiveDiagnosis(this);
-">
-All Patients (<span id="all-count">${allCount}</span>)
-</button>
-`;
-
-   const followUp =
-    data.find(x => x.name === '🔔 Follow Up');
-
-const explain =
-    data.find(x => x.name === 'Explain');
-
-
-if (followUp) {
-
-    const { data: patients } = await client
+    const { data: followups } =
+        await client
         .from('patients')
         .select('id')
         .eq('needs_followup', true);
 
-    const count = patients?.length || 0;
-
-    container.innerHTML += `
-    <button
-    class="diagnosis-btn special-followup"
-onclick="
-showFollowUpPatients();
-setActiveDiagnosis(this);
-    ">
-    ${followUp.name} (<span id="followup-count">${count}</span>)
-    </button>
-    `;
-}
-
-
-if (
-    explain &&
-    sessionStorage.getItem('loggedIn') === 'zahy'
-) {
-
-    const { data: patients } = await client
-        .from('patients')
-        .select('id')
-        .eq('diagnosis', explain.name);
-
-    const count = patients?.length || 0;
-
-    container.innerHTML += `
-    <button
-    class="diagnosis-btn special-explain"
-    onclick="
-    showPatients('${explain.name}');
-    setActiveDiagnosis(this);
-    ">
-    ${explain.name} (${count})
-    </button>
-    `;
-}
-const currentUser =
-    sessionStorage.getItem('loggedIn');
-for(const item of data){
-
-    if(
-        item.name === '🔔 Follow Up' ||
-        item.name === 'Explain'
-    ){
-        continue;
-    }
-
-    const { data: patients } = await client
-        .from('patients')
-        .select('id')
-        .eq('diagnosis', item.name);
-
-    const count = patients?.length || 0;
-
-    container.innerHTML += `
-    <button
-    class="diagnosis-btn"
-    onclick="
-    showPatients('${item.name}');
-    setActiveDiagnosis(this);
-    ">
-    ${item.name} (<span id="count-${item.id}">${count}</span>)
-    </button>
-    `;
-}
-
-}
- async function refreshCounts(){
-
-    const { data: diagnoses } = await client
-        .from('diagnoses')
-        .select('*');
-
-    const { data: allPatients } = await client
-        .from('patients')
-        .select('id')
-        .not('diagnosis', 'ilike', 'explain');
-
-    document.getElementById('all-count').textContent =
+    document.getElementById(
+        'all-count'
+    ).textContent =
         allPatients?.length || 0;
 
-    const { data: followups } = await client
-        .from('patients')
-        .select('id')
-        .eq('needs_followup', true);
-
-    const followupLabel =
-        document.getElementById('followup-count');
-
-    if(followupLabel){
-        followupLabel.textContent =
-            followups?.length || 0;
-    }
-
-    for(const diagnosis of diagnoses){
-
-        if(
-            diagnosis.name === '🔔 Follow Up' ||
-            diagnosis.name === 'Explain'
-        ){
-            continue;
-        }
-
-        const { data: patients } = await client
-            .from('patients')
-            .select('id')
-            .eq('diagnosis', diagnosis.name);
-
-        const el =
-            document.getElementById(
-                `count-${diagnosis.id}`
-            );
-
-        if(el){
-            el.textContent =
-                patients?.length || 0;
-        }
-    }
-}
-async function addDiagnosis(){
-
-    const name =
-        document.getElementById('diagnosisName')
-        .value
-        .trim();
-
-    if(!name){
-        alert('Enter diagnosis name');
-        return;
-    }
-
-    const { data: existing } = await client
-        .from('diagnoses')
-        .select('id')
-        .ilike('name', name);
-
-    if(existing && existing.length > 0){
-
-
-        alert('Diagnosis already exists');
-
-        return;
-    }
-
-    const { error } = await client
-        .from('diagnoses')
-        .insert({
-            name:name
-        });
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    document.getElementById('diagnosisName').value='';
-
-closeDiagnosisModal();
-
-await loadDiagnoses();
+    document.getElementById(
+        'followup-count'
+    ).textContent =
+        followups?.length || 0;
 }
 async function showFollowUpPatients(){
 
@@ -2139,12 +1782,11 @@ title="Send WhatsApp">
             <span
             class="followup-icon active"
             style="font-size:24px;"
-            onclick="
-            toggleFollowUp(
-            ${patient.id},
-            '${patient.diagnosis}',
-            ${patient.needs_followup}
-            )">
+onclick="
+toggleFollowUp(
+${patient.id},
+${patient.needs_followup}
+)">
             🔔
             </span>
 
@@ -2164,12 +1806,6 @@ title="Send WhatsApp">
             ${patient.phone || '-'}
         </div>
 
-        <div>
-            🩺 <b>Diagnosis:</b><br>
-            <span class="diagnosis-badge">
-                ${patient.diagnosis}
-            </span>
-        </div>
 
     </div>
 
@@ -2273,12 +1909,11 @@ title="Send WhatsApp">
             <span
             class="followup-icon ${patient.needs_followup ? 'active' : ''}"
             style="font-size:24px;"
-            onclick="
-            toggleFollowUp(
-            ${patient.id},
-            '${patient.diagnosis}',
-            ${patient.needs_followup}
-            )">
+onclick="
+toggleFollowUp(
+${patient.id},
+${patient.needs_followup}
+)">
             🔔
             </span>
 
@@ -2296,13 +1931,6 @@ title="Send WhatsApp">
         <div>
             📞 <b>Mobile:</b><br>
             ${patient.phone || '-'}
-        </div>
-
-        <div>
-            🩺 <b>Diagnosis:</b><br>
-            <span class="diagnosis-badge">
-                ${patient.diagnosis}
-            </span>
         </div>
 
     </div>
@@ -2328,167 +1956,7 @@ title="Send WhatsApp">
     });
 
 }
-    async function showPatients(diagnosis){
-
-    const { data, error } = await client
-        .from('patients')
-        .select('*')
-        .eq('diagnosis', diagnosis);
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    data.sort(
-        (a,b) =>
-        Number(b.needs_followup)
-        -
-        Number(a.needs_followup)
-    );
-
-    const container =
-        document.getElementById('patientsContainer');
-
-    container.innerHTML = '';
-
-    data.forEach(patient => {
-
-        container.innerHTML += `
-<div
-class="card ${patient.needs_followup ? 'followup-card' : ''}"
-data-date="${patient.last_update || ''}"
->
-
-    <div class="card-top">
-
-
-
-<div>
-    📁 <b>File No:</b> ${patient.file_no}
-
-    ${
-        patient.needs_followup
-        ? `
-        <span class="followup-badge">
-            Follow Up Needed
-        </span>
-        `
-        : ''
-    }
-</div>
-
-
-
-        <div style="display:flex;gap:12px;align-items:center;">
-<span
-onclick='sendWhatsApp(${JSON.stringify(patient)})'
-style="
-cursor:pointer;
-font-size:24px;
-color:#25D366;
-"
-title="Send WhatsApp">
-<i class="fa-brands fa-whatsapp"></i>
-</span>
-            <span
-            onclick="deletePatient(${patient.id})"
-            style="cursor:pointer;font-size:24px;">
-            🗑️
-            </span>
-
-
-            <span
-            onclick="openEditPatient(${patient.id})"
-            style="cursor:pointer;font-size:24px;">
-            ✏️
-            </span>
-
-            <span
-            class="followup-icon ${patient.needs_followup ? 'active' : ''}"
-            style="font-size:24px;"
-            onclick="
-            toggleFollowUp(
-            ${patient.id},
-            '${patient.diagnosis}',
-            ${patient.needs_followup}
-            )">
-            🔔
-            </span>
-
-        </div>
-
-    </div>
-
-    <div class="card-row">
-
-<div>
-    👤 <b>Name:</b><br>
-    ${patient.name}
-</div>
-
-<div>
-    📞 <b>Mobile:</b><br>
-    ${patient.phone || '-'}
-</div>
-
-<div>
-    🩺 <b>Diagnosis:</b><br>
-    <span class="diagnosis-badge">
-        ${patient.diagnosis}
-    </span>
-</div>
-
-</div>
-    <hr>
-
-    <div class="card-row">
-
-
-<div class="card-row">
-
-    <div>
-        📝 <b>Remarks:</b><br>
-        ${patient.remarks || '-'}
-    </div>
-
-    <div>
-        📅 <b>Last Update:</b><br>
-        ${patient.last_update || '-'}
-    </div>
-
-</div>
-
-
-        
-
-    </div>
-
-</div>
-`;
-    });
-
-}
-async function deleteDiagnosis(id){
-
-    if(!confirm('Delete Diagnosis ?')){
-        return;
-    }
-
-    const { error } = await client
-        .from('diagnoses')
-        .delete()
-        .eq('id', id);
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-   await loadDiagnoses();
-await showAllPatients();
-
-}
+    
 async function deletePatient(id){
 
     if(!confirm('Delete this patient ?')){
@@ -2509,12 +1977,6 @@ async function deletePatient(id){
 
 await showAllPatients();
 await refreshCounts();
-
-setTimeout(() => {
-    document
-        .querySelector('.diagnosis-btn')
-        ?.classList.add('active');
-}, 300);
 
 }
     async function openEditPatient(id){
@@ -2547,45 +2009,12 @@ data.phone || '';
     document.getElementById('editLastUpdate').value =
         new Date().toISOString().split('T')[0];
 
-    const select =
-        document.getElementById('editDiagnosis');
-
-    select.innerHTML='';
-
-    const { data: diagnoses } = await client
-        .from('diagnoses')
-        .select('*')
-        .order('name');
-
-diagnoses.forEach(item => {
-
-if(item.name === '🔔 Follow Up'){
-    return;
+document.getElementById(
+    'editPatientModal'
+).style.display='block';
 }
 
-if(
-    item.name === 'Explain' &&
-    sessionStorage.getItem('loggedIn') !== 'zahy'
-){
-    return;
-}
-
-       
-
-    select.innerHTML += `
-    <option value="${item.name}">
-    ${item.name}
-    </option>
-    `;
-
-});
-
-    select.value = data.diagnosis;
-
-    document.getElementById(
-        'editPatientModal'
-    ).style.display='block';
-}
+   
 
 function closeEditPatientModal(){
 
@@ -2624,19 +2053,8 @@ document.getElementById(
     'editNeedsFollowup'
 ).checked,
 
-original_diagnosis:
-document.getElementById(
-    'editNeedsFollowup'
-).checked
-? document.getElementById(
-    'editDiagnosis'
-).value
-: null,
-            diagnosis:
-                document.getElementById(
-                    'editDiagnosis'
-                ).value,
-
+original_diagnosis: null,
+    
             remarks:
                 document.getElementById(
                     'editRemarks'
@@ -2663,6 +2081,13 @@ document.getElementById(
 await showAllPatients();
  await refreshCounts();
 }
+ window.addEventListener('load', async () => {
+
+    await showAllPatients();
+
+    await refreshCounts();
+
+});
 </script>
 <div id="editPatientModal" class="modal">
 
@@ -2734,13 +2159,6 @@ accent-color:#ff8c1a;
 
 <br><br>
 
-<label>Diagnosis:</label>
-       <select
-id="editDiagnosis"
-style="width:100%;padding:12px;">
-</select>
-
-        <br><br>
 
         <label>Remarks:</label>
         <textarea

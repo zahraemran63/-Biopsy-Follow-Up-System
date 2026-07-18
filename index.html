@@ -1919,9 +1919,11 @@ const { error } = await client
 
         needs_followup: needsFollowup,
 
-        original_diagnosis: null
-    });
+        original_diagnosis: null,
 
+        overdue_notified: false
+    });
+     
     if(error){
 
         alert(error.message);
@@ -2506,7 +2508,7 @@ document.getElementById(
 ).checked,
 
 original_diagnosis: null,
-    
+    overdue_notified: false,
             remarks:
                 document.getElementById(
                     'editRemarks'

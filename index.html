@@ -277,6 +277,18 @@ console.log('ExcelJS =', typeof ExcelJS);
         transform:translateX(0);
     }
 }
+ .completed-badge{
+    display:inline-block;
+    margin-left:10px;
+    padding:4px 10px;
+    border-radius:999px;
+
+    background:#198754;
+    color:white;
+
+    font-size:12px;
+    font-weight:700;
+}
  .card:not(.followup-card){
     background:#f8fbff;
 }
@@ -2201,10 +2213,12 @@ async function showCompletedPatients(){
 <div class="card-top">
 
     <div>
-        <i class="fa-solid fa-check"></i>
-        <b> Completed</b>
-        &nbsp;&nbsp;
-        <b>File No:</b> ${patient.file_no}
+        📁 <b>File No:</b> ${patient.file_no}
+
+<span class="completed-badge">
+    Completed
+</span>
+
     </div>
 
     <div style="display:flex;gap:12px;align-items:center;">

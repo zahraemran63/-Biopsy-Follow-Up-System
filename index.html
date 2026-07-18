@@ -2700,21 +2700,16 @@ window.addEventListener(
         subscriptionId
     );
 
-    if (!subscriptionId) {
-        console.log("No Subscription ID");
-        return;
-    }
+    if (!subscriptionId) return;
 
-    const { data, error } = await client
+    const { error } = await client
         .from("notification_subscriptions")
         .upsert({
             id: 1,
             subscription_id: subscriptionId
-        })
-        .select();
+        });
 
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
+    console.log(error);
 }
       
 async function registerNotifications() {

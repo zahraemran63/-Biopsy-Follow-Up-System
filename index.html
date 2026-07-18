@@ -1198,6 +1198,7 @@ console.log(client);
 
     searchPatients();
 }
+ 
  async function checkOverduePatients(){
 
 const { data } = await client
@@ -2689,6 +2690,33 @@ window.addEventListener(
 
 </script>
      <script>
+      async function saveSubscriptionId() {
+
+    const subscriptionId =
+        await OneSignal.User.PushSubscription.id;
+
+    console.log(
+        "Subscription ID:",
+        subscriptionId
+    );
+
+    if (!subscriptionId) {
+        console.log("No Subscription ID");
+        return;
+    }
+
+    const { data, error } = await client
+        .from("notification_subscriptions")
+        .upsert({
+            id: 1,
+            subscription_id: subscriptionId
+        })
+        .select();
+
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
+}
+      
 async function registerNotifications() {
 
     const permission =
@@ -2710,13 +2738,18 @@ window.addEventListener(
      <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
 <script>
-window.OneSignalDeferred = window.OneSignalDeferred || [];
+window.OneSignalDeferred =
+    window.OneSignalDeferred || [];
 
-OneSignalDeferred.push(async function (OneSignal) {
+OneSignalDeferred.push(
+async function (OneSignal) {
 
     await OneSignal.init({
-        appId: "dcb30628-fa6f-4a2d-9f59-bca238878ddf"
+        appId:
+        "dcb30628-fa6f-4a2d-9f59-bca238878ddf"
     });
+
+    await saveSubscriptionId();
 
     console.log("OneSignal Ready");
 

@@ -234,6 +234,49 @@ console.log('ExcelJS =', typeof ExcelJS);
     100% { transform:translateX(-50%) rotate(0deg); }
 
 }
+ .overdue-card{
+
+    animation:
+        overdueShake 1s infinite;
+
+    box-shadow:
+        0 0 0 2px #dc3545,
+        0 0 15px rgba(220,53,69,.5),
+        0 0 30px rgba(220,53,69,.35),
+        0 10px 25px rgba(220,53,69,.25) !important;
+}
+
+.overdue-card::before{
+    background:
+    linear-gradient(
+        180deg,
+        #dc3545,
+        #ff6b6b
+    ) !important;
+}
+
+@keyframes overdueShake{
+
+    0%{
+        transform:translateX(0);
+    }
+
+    25%{
+        transform:translateX(-2px);
+    }
+
+    50%{
+        transform:translateX(2px);
+    }
+
+    75%{
+        transform:translateX(-2px);
+    }
+
+    100%{
+        transform:translateX(0);
+    }
+}
  .card:not(.followup-card){
     background:#f8fbff;
 }
@@ -1957,7 +2000,14 @@ document.getElementById(
 ).innerHTML =
     `Follow Up (${followups?.length || 0})`;}
 async function showFollowUpPatients(){
-
+const isOverdue =
+    patient.last_update &&
+    (
+        (new Date() -
+        new Date(patient.last_update))
+        /
+        (1000 * 60 * 60 * 24)
+    ) >= 1;
     document.getElementById('followUpBtn')
         .classList.add('active');
 
@@ -1989,7 +2039,7 @@ async function showFollowUpPatients(){
 
         container.innerHTML += `
 <div
-class="card followup-card"
+class="card followup-card ${isOverdue ? 'overdue-card' : ''}"
 data-date="${patient.last_update || ''}"
 >
 
@@ -2205,7 +2255,16 @@ async function showCompletedPatients(){
     });
 }
     async function showAllPatients(){
-
+const isOverdue =
+    patient.needs_followup &&
+    patient.last_update &&
+    (
+        (new Date() -
+        new Date(patient.last_update))
+        /
+        (1000 * 60 * 60 * 24)
+    ) >= 1;
+     
     document.getElementById('allPatientsBtn')
         .classList.add('active');
 
@@ -2244,7 +2303,9 @@ console.log(data);
 
         container.innerHTML += `
 <div
-class="card ${patient.needs_followup ? 'followup-card' : ''}"
+class="card
+${patient.needs_followup ? 'followup-card' : ''}
+${isOverdue ? 'overdue-card' : ''}"
 data-date="${patient.last_update || ''}"
 >
 

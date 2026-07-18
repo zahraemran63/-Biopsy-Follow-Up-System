@@ -2702,12 +2702,13 @@ window.addEventListener(
 
     if (!subscriptionId) return;
 
-    const { error } = await client
-        .from("notification_subscriptions")
-        .upsert({
-            id: 1,
-            subscription_id: subscriptionId
-        });
+const { error } = await client
+    .from("notification_subscriptions")
+    .insert({
+        subscription_id: subscriptionId
+    });
+
+console.log("SAVE ERROR:", error);
 
     console.log(error);
 }

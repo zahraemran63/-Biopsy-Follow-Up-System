@@ -2755,24 +2755,15 @@ async function subscribeToPush() {
 
     console.log(subscription);
 
-   const { data, error } =
-    await client
-        .from('push_subscriptions')
-        .insert({
-            subscription: JSON.parse(
-                JSON.stringify(subscription)
-            )
-        });
+const result = await client
+    .from('push_subscriptions')
+    .insert({
+        subscription: JSON.parse(
+            JSON.stringify(subscription)
+        )
+    });
 
-console.log(data);
-
-if(error){
-    console.error(error);
-}
-else{
-    console.log(
-        'Push subscription saved'
-    );
+console.log('RESULT =>', result);
 }}
 
 window.addEventListener(

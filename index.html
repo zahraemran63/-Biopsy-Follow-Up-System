@@ -2772,5 +2772,21 @@ window.addEventListener(
 );
 
 </script>
+     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" deferndow.OneSignalDeferred =
+window.OneSignalDeferred || [];
+
+OneSignalDeferred.push(async function (OneSignal) {
+
+    await OneSignal.init({
+
+        appId:
+        "dcb30628-fa6f-4a2d-9f59-bca238878ddf",
+
+        allowLocalhostAsSecureOrigin: true
+
+    });
+
+});
+</script>
 </body>
 </html>

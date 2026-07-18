@@ -1,0 +1,8 @@
+{
+  "name": "BIOPSY FOLLOW UP SYSTEM",
+  "short_name": "BIOPSY",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#dc3545"
+}

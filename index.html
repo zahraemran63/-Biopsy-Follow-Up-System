@@ -292,6 +292,26 @@ console.log('ExcelJS =', typeof ExcelJS);
  .card:not(.followup-card){
     background:#f8fbff;
 }
+ .system-identity{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:38px;
+
+    background:#dc3545;
+    color:white;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:1px;
+
+    z-index:999999;
+}
  .card:not(.followup-card) .card-top{
     background:linear-gradient(
         180deg,
@@ -551,9 +571,9 @@ console.log('ExcelJS =', typeof ExcelJS);
     
 body{
     font-family:Arial,sans-serif;
-    background:#f5f5f5;
+    background:#fff7f7;
     padding:20px;
-    padding-top:90px;
+    padding-top:125px;
 }
     .modal{
     display:none;
@@ -845,6 +865,9 @@ button{
 </head>
 
     <body>
+<div class="system-identity">
+    🔬 BIOPSY FOLLOW UP SYSTEM
+</div>
 
         <div id="loginOverlay">
     <div class="login-box">
@@ -893,12 +916,12 @@ Logout
 
     <div style="text-align:center;margin-bottom:25px;">
 
-    <div style="font-size:70px;">
-        🩺 ❤️
-    </div>
+<div style="font-size:70px;">
+    🧫 🔬
+</div>
 
-    <h1 style="
-        color:#0d6efd;
+<h1 style="
+color:#dc3545;
         font-size:48px;
         margin-top:10px;
     ">

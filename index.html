@@ -2749,7 +2749,11 @@ async function (OneSignal) {
         "dcb30628-fa6f-4a2d-9f59-bca238878ddf"
     });
 
-    await saveSubscriptionId();
+    setTimeout(async () => {
+
+        await saveSubscriptionId();
+
+    }, 5000);
 
     console.log("OneSignal Ready");
 

@@ -2770,39 +2770,21 @@ window.addEventListener(
     'load',
     subscribeToPush
 );
-
-</script>
-     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" deferndow.OneSignalDeferred =
-window.OneSignalDeferred || [];
-
-OneSignalDeferred.push(async function (OneSignal) {
-
-    await OneSignal.init({
-
-        appId:
-        "dcb30628-fa6f-4a2d-9f59-bca238878ddf",
-
-        allowLocalhostAsSecureOrigin: true
-
-    });
-
-});
-</script>
-     <script src="https://.com/sdks/web/v16/OneSignalSDK.page.js
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
 <script>
-window.OneSignalDeferred =
-window.OneSignalDeferred || [];
+window.OneSignalDeferred = window.OneSignalDeferred || [];
 
-OneSignalDeferred.push(async function(OneSignal) {
+OneSignalDeferred.push(async function (OneSignal) {
 
     await OneSignal.init({
         appId: "dcb30628-fa6f-4a2d-9f59-bca238878ddf"
     });
 
-    await OneSignal.Notifications.requestPermission();
+    console.log("OneSignal Ready");
 
 });
 </script>
-</body>
+</script>
+     </body>
 </html>

@@ -1157,10 +1157,11 @@ console.log(client);
 }
  async function checkOverduePatients(){
 
-    const { data } = await client
-        .from('patients')
-        .select('*')
-        .eq('completed', false);
+const { data } = await client
+    .from('patients')
+    .select('*')
+    .eq('completed', false)
+    .eq('needs_followup', true);
 
     const today = new Date();
 

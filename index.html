@@ -2037,21 +2037,23 @@ await checkOverduePatients();
         today;
 
     document.getElementById(
+        'overdueAlert'
+    ).style.display = 'none';
+
+    document.getElementById(
         'patientModal'
     ).style.display = 'block';
 }
 
-function closePatientModal(){
+async function closePatientModal(){
 
     document.getElementById(
         'patientModal'
     ).style.display='none';
+
+    await checkOverduePatients();
 }
-
-
-
-    
-async function refreshCounts(){
+ async function refreshCounts(){
  const { data: completed } =
     await client
     .from('patients')
@@ -2557,7 +2559,9 @@ data.phone || '';
 
     document.getElementById('editLastUpdate').value =
         new Date().toISOString().split('T')[0];
-
+document.getElementById(
+    'overdueAlert'
+).style.display = 'none';
 document.getElementById(
     'editPatientModal'
 ).style.display='block';
@@ -2565,11 +2569,13 @@ document.getElementById(
 
    
 
-function closeEditPatientModal(){
+async function closeEditPatientModal(){
 
     document.getElementById(
         'editPatientModal'
     ).style.display='none';
+
+    await checkOverduePatients();
 }
 
 async function updatePatient(){

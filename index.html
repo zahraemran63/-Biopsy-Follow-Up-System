@@ -888,6 +888,19 @@ button{
 }
 
 </style>
+ <script>
+if(
+    sessionStorage.getItem('loggedIn')
+){
+    document.write(`
+    <style>
+        #loginOverlay{
+            display:none !important;
+        }
+    </style>
+    `);
+}
+</script>
 </head>
 
     <body>

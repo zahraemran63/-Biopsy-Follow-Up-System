@@ -1686,60 +1686,83 @@ async function exportExcel(){
 
             });
 
-            patients.forEach(
-                (patient,index) => {
+            patients.forEach((patient,index) => {
 
-                const row =
-                    sheet.addRow({
+    const row = sheet.addRow({
 
-                    no:index + 1,
+        no: index + 1,
 
-                    mrn:
-                        patient.file_no || '',
+        mrn: patient.file_no || '',
 
-                    name:
-                        patient.name || '',
+        name: patient.name || '',
 
-                    phone:
-                        patient.phone || '',
+        phone: patient.phone || '',
 
-                    remark:
-                        patient.remarks || '',
+        remark: patient.remarks || '',
 
-                    update:
-                        patient.last_update || ''
+        update: patient.last_update || ''
 
-                });
+    });
 
-                row.eachCell(cell => {
+    const isOverdue =
+        patient.needs_followup &&
+        patient.last_update &&
+        (
+            (new Date() - new Date(patient.last_update))
+            /
+            (1000 * 60 * 60 * 24)
+        ) >= 1;
 
-                    cell.border = {
-                        top:{style:'thin'},
-                        left:{style:'thin'},
-                        bottom:{style:'thin'},
-                        right:{style:'thin'}
-                    };
+    row.eachCell(cell => {
 
-                });
+        cell.border = {
+            top:{style:'thin'},
+            left:{style:'thin'},
+            bottom:{style:'thin'},
+            right:{style:'thin'}
+        };
 
-                if(index % 2 === 0){
+    });
 
-                    row.eachCell(cell => {
+    if(isOverdue){
 
-                        cell.fill = {
-                            type:'pattern',
-                            pattern:'solid',
-                            fgColor:{
-                                argb:'F3F6FA'
-                            }
-                        };
+        row.eachCell(cell => {
 
-                    });
-
+            cell.fill = {
+                type:'pattern',
+                pattern:'solid',
+                fgColor:{
+                    argb:'FFFFC7CE'
                 }
+            };
 
-            });
+            cell.font = {
+                bold:true,
+                color:{
+                    argb:'FF9C0006'
+                }
+            };
 
+        });
+
+    }
+    else if(index % 2 === 0){
+
+        row.eachCell(cell => {
+
+            cell.fill = {
+                type:'pattern',
+                pattern:'solid',
+                fgColor:{
+                    argb:'FFF3F6FA'
+                }
+            };
+
+        });
+
+    }
+
+});
             sheet.views = [
                 {
                     state:'frozen',
